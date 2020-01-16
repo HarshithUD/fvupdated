@@ -150,8 +150,8 @@ class toApprove extends Component{
                 if(result){
                   Swal.close();
                     Swal.fire(
-                        'Approved!',
-                        'User has been added to the Queue.',
+                        'Activated!',
+                        'User has been activated.',
                         'success'
                     ).then(() => {
                       Swal.fire({

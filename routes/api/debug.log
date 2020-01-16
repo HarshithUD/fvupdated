@@ -1,3 +1,69 @@
 Server running on Port 80
 Server is ready to take messages
 Database Connected Successfully
+true
+5
+5e1fe22ba697f90bd8c8bf03
+{
+  address: { streetaddress: 'qq', city: 'qqq', state: '11', pincode: '11' },
+  payout: {
+    requested: false,
+    eligible: 0,
+    date: 2020-01-16T04:10:19.542Z,
+    transactions: []
+  },
+  verified: false,
+  active: true,
+  stage: 1,
+  class: '1',
+  level: '0',
+  weight: 0,
+  wallet: 800,
+  action: true,
+  declined: false,
+  _id: 5e1fe22ba697f90bd8c8bf03,
+  name: 'Harshith',
+  email: 'har@undigit.com',
+  password: '$2a$10$fxo2Nt2ftDvv20gffKmxJuYiCtPD2WXW00SR/9DcvtjgmZGAWX2ze',
+  number: '8792074120',
+  referralId: 'HAA1J0',
+  referrer: '',
+  childIds: [
+    {
+      date: 2020-01-16T04:37:07.627Z,
+      _id: 5e1fe873a697f90bd8c8bf0f,
+      userId: '5e1fe2d5a697f90bd8c8bf04'
+    },
+    {
+      date: 2020-01-16T04:37:11.948Z,
+      _id: 5e1fe877a697f90bd8c8bf11,
+      userId: '5e1fe31aa697f90bd8c8bf05'
+    }
+  ],
+  date: 2020-01-16T04:10:19.542Z,
+  transactions: [
+    {
+      date: 2020-01-16T04:37:02.359Z,
+      _id: 5e1fe86ea697f90bd8c8bf0d,
+      name: 'Initial Deposit',
+      type: 'Deposit',
+      amount: '+800'
+    },
+    {
+      date: 2020-01-16T07:44:21.680Z,
+      _id: 5e201455e683f92bd8da5e99,
+      name: 'Referral',
+      type: 'Deposit',
+      amount: '+1600'
+    }
+  ],
+  childUpgraded: [],
+  __v: 0,
+  accnumber: 'qq',
+  bankname: 'qq',
+  bankuser: 'qq',
+  ifsc: 'qq',
+  lastname: 'sd',
+  pan: 'ZA',
+  parentId: null
+}

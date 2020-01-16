@@ -36,7 +36,6 @@ router.get('/approve/:userid',async (request,response) => {
     //get refferral id
     var referrerInfo = await User.findOne({_id:userid});
     var referrer = referrerInfo.referrer;
-    console.log(referrer);
     if(typeof referrer === 'undefined'){
         result = {
             error:true,
@@ -46,7 +45,6 @@ router.get('/approve/:userid',async (request,response) => {
     }
     else{
         var count = await countUsers();
-        console.log(count)
         if(count!==0){
             var referrerDetails = await User.findOne({referralId:referrer});
             const referrerData = {
@@ -61,7 +59,7 @@ router.get('/approve/:userid',async (request,response) => {
             // var referrerDetails = await User.findOne({referralId:referrer});
             const referrerData = {
                 childIds:[],
-                parentId:''
+                parentId:null
             }
             const result = await QueueOperations(referrerData,userid);
             response.send(result);
@@ -106,7 +104,7 @@ class Stack {
     } 
 }
 
-//New Logic
+//Breadth First Algorithm
 var finalStack = new Stack();
 var outputStack = new Stack();
 var searched = new Stack();
@@ -123,16 +121,30 @@ async function getDecendants(ancId){
     }
     var parent = finalStack.items.shift();
     var checkPstages = await getUserStage(parent);
-    if(checkPstages>0){
+    if(checkPstages===1){
         var childrensAt = await checkAllChildren(finalStack.items);
         var isChildSameStage = childrensAt.every(isSameStage);
+        console.log(isChildSameStage);
+        console.log(finalStack.items.length)
         if(finalStack.items.length===5 && isChildSameStage){
-            var updateUser = await User.findOneAndUpdate({_id:parent},{$inc:{stage:2}},{useFindAndModify:false});
-            var checkUpgrade = doStageOperation(updateUser);
+            var x = await getAdminResult();
+            var updateUser = await User.findOneAndUpdate({_id:parent},{$set:{stage:2,wallet:x.lvl1depfin},
+                $push:{
+                    transactions:{          
+                        name:"Referral",
+                        type:"Deposit",
+                        amount:'+'+2*x.lvl1depfin
+                    }
+                }
+            },{useFindAndModify:false});
+            var checkUpgrade = await doStageOperation(updateUser);
             console.log(updateUser)
         }
         else if(!isChildSameStage){
             console.log("Not")
+        }
+        else{
+            console.log(finalStack.items.length)
         }
     }
     return finalStack;
@@ -167,7 +179,8 @@ async function getUserStage(_id){
 //check for parent
 async function checkForParent(userId){
     var result = await User.findOne({_id:userId});
-    if((result.parentId) !== null){
+    var parent_id = result.parentId;
+    if(parent_id !== null || (parent_id!=='')){
         var getHisParent = result.parentId;
         return getHisParent;
     }
@@ -179,39 +192,43 @@ async function checkForParent(userId){
 //Stage Upgrade
 async function doStageOperation(user){
     var _id = user._id;
+    console.log(_id)
     var userInfo = await User.findOne({_id});
     var userParent = userInfo.parentId;
-    var parentInfo = await User.findOne({_id:userParent});
-    var getChildUpgraded = parentInfo.childUpgraded;
-    if(typeof getChildUpgraded === 'undefined'){
+    if(userParent !== null){
+        var parentInfo = await User.findOne({_id:userParent});
+        var getChildUpgraded = parentInfo.childUpgraded;
+        if(typeof getChildUpgraded === 'undefined'){
         var updateInfo = User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
             }
         }})
-    }
-    else if(getChildUpgraded.length === 5){
+        }
+        else if(getChildUpgraded.length === 5){
         var updateInfo = User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
             }
         }})
         //Upgrade parent
-        var upgradeParent = await upgradeParent(userParent);
-        console.log(upgradeParent);
-    }
-    else if(getChildUpgraded.length === 6){
+        let upgradeParentx = await upgradeParent(userParent);
+        console.log(upgradeParentx);
+        }
+        else if(getChildUpgraded.length === 6){
         var updateInfo = User.findOneAndUpdate({_id:userParent},{$set:{
             childUpgraded:{
                 userId:user._id
             }
         }})
+        }
     }
     return;
 }
 
 //upgrade parent
 async function upgradeParent(_id){
+    console.log(_id)
     var x = await getAdminResult();
     var upgraded = await User.findOneAndUpdate({_id},{$inc:
         {
