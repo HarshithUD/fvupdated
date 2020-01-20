@@ -9,7 +9,7 @@ export default class landing extends Component {
     render() {
         return (
           <div className="container">
-            <div className="row">
+            <div className="row" style={{paddingTop:'3rem'}}>
               <Login />
               <Register />
             </div>

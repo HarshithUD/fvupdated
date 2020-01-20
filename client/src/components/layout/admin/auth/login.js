@@ -68,7 +68,7 @@ class Login extends Component {
         const { errors } = this.state;
         return (
             <div className="pr-0 ml-auto mr-auto custom-log">
-                <div className="log-in-form-wrapper mt-3">
+                <div className="log-in-form-wrapper">
                     <form autoComplete='off' noValidate onSubmit={this.handleSubmit} >
                         <h2 className="pb-3">Log In</h2>
                         <div className="form-group">

@@ -483,7 +483,7 @@
   .log-in-form-wrapper{
     display: flex;
     justify-content: flex-end;
-    
+    height:100%;
   }
   .log-in-form-wrapper h2{
     color: white;
@@ -498,7 +498,6 @@
     padding: 3em;
     background: #6f16a7;
     width: 400px;
-    height: 90vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -513,7 +512,6 @@
     padding: 3em;
     background: #f8f0ff;
     width: 400px;
-    height: 90vh;
   }
   .custom{
     padding-left: 0px;

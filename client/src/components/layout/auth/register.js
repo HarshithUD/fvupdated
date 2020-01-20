@@ -121,7 +121,7 @@ class Register extends Component {
         const { otp, numInputs, separator, isDisabled, hasErrored, isInputNum } = this.state;
         return (
             <div className="col-md-6 custom regForm">
-                <div className="sign-up-form-wrapper mt-3">
+                <div className="sign-up-form-wrapper">
                     <form noValidate onSubmit={this.handleSubmit}>
                         <h2>Register</h2>
                         <div className="form-group">
