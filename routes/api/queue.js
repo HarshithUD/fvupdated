@@ -105,10 +105,10 @@ class Stack {
 }
 
 //Breadth First Algorithm
+async function getDecendants(ancId){
 var finalStack = new Stack();
 var outputStack = new Stack();
 var searched = new Stack();
-async function getDecendants(ancId){
     outputStack.items.push(ancId)
     while(outputStack.items.length!==0){
         var toCheck = outputStack.items[0];
@@ -120,13 +120,14 @@ async function getDecendants(ancId){
         finalStack.items.push(nextEle);
     }
     var parent = finalStack.items.shift();
+    let finalEles = finalStack.items.filter( onlyUnique );
     var checkPstages = await getUserStage(parent);
     if(checkPstages===1){
-        var childrensAt = await checkAllChildren(finalStack.items);
+        var childrensAt = await checkAllChildren(finalEles);
         var isChildSameStage = childrensAt.every(isSameStage);
         console.log(isChildSameStage);
-        console.log(finalStack.items.length)
-        if(finalStack.items.length===5 && isChildSameStage){
+        console.log(finalEles)
+        if(finalEles.length===5 && isChildSameStage){
             var x = await getAdminResult();
             var updateUser = await User.findOneAndUpdate({_id:parent},{$set:{stage:2,wallet:x.lvl1depfin},
                 $push:{
@@ -144,10 +145,15 @@ async function getDecendants(ancId){
             console.log("Not")
         }
         else{
-            console.log(finalStack.items.length)
+            console.log(finalEles.length)
         }
     }
-    return finalStack;
+    return finalEles;
+}
+
+//only unique elems
+function onlyUnique(value, index, self) { 
+    return self.indexOf(value) === index;
 }
 
 //
@@ -243,7 +249,7 @@ async function upgradeParent(_id){
             transactions:{          
                 name:"Referral",
                 type:"Deposit",
-                amount:'+'+2*x.lvl1depfin
+                amount:'+'+3*x.lvl1depfin
             }
         }
     }
@@ -284,6 +290,7 @@ async function QueueOperations(referrerData,userid){
                 console.log(errors);
             }
             else{
+                if(referrerData.parentId !== null){
                 User.findByIdAndUpdate({_id:referrerData.parentId},{$push:{
                     childIds:{
                         userId:result._id
@@ -292,6 +299,7 @@ async function QueueOperations(referrerData,userid){
                     if(err){console.log(err)}
                 })
             }
+        }
         })
     }
 
