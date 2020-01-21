@@ -71,6 +71,13 @@ class toApprove extends Component{
 
 
     viewDetails = (user) => {
+      let useraddress = 'Not Updated';
+      if(typeof user.address !== 'undefined'){
+        useraddress = "<li><b>Street Address:</b>"+user.address.streetaddress+"</li>"+
+        "<li><b>State:</b>"+user.address.state+"</li>"+
+        "<li><b>City:</b>"+user.address.city+"</li>"+
+        "<li><b>Pincode:</b>"+user.address.pincode+"</li>"
+      }
         Swal.fire({
             title: 'User Details',
             html: 
@@ -83,7 +90,9 @@ class toApprove extends Component{
             "<tbody>" +
                 "<tr>" +
                 "<td>Address</td>" +
-                "<td>"+user.address+"</td>" +
+                "<td><ul style='list-style:none;padding:0;margin:0;text-align: left;'>" +
+                useraddress +
+                "</ul></td>" +
                 "</tr>" +
                 "<tr>" +
                 "<td>PAN number</td>" +

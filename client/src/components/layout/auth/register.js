@@ -113,7 +113,16 @@ class Register extends Component {
             allowOutsideClick: false
         })
         Swal.showLoading();
-        this.props.registerUser(NewUser, this.props.history); 
+        this.props.registerUser(NewUser, this.props.history);
+        this.setState({
+            name: '',
+            remail: '',
+            mobile: '',
+            rpassword: '',
+            password2: '',
+            referrer:'',
+            errors:{}
+        })
     }
 
     render() {

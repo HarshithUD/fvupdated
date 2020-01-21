@@ -96,7 +96,7 @@ class toApprove extends Component{
   }
 
     viewDetails = (user) => {
-      let useraddress = '';
+      let useraddress = 'Not Updated';
       if(typeof user.address !== 'undefined'){
         useraddress = "<li><b>Street Address:</b>"+user.address.streetaddress+"</li>"+
         "<li><b>State:</b>"+user.address.state+"</li>"+

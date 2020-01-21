@@ -565,23 +565,34 @@ function getUserData(userid){
     let child1 = [];
     return new Promise((resolve,reject) => {
         User.find({_id:userid},async (err,response) => {
-            userdata = {
-                name:response[0].name,
-                id:response[0]._id,
-                child1: (response[0].childIds[0] && await getData(response[0].childIds[0])),
-                child2: (response[0].childIds[1] && await getData(response[0].childIds[1]))
+            if((response[0].stage === 1) && response[0].level === 1){
+                userdata = {
+                    name:response[0].name,
+                    id:response[0]._id,
+                    child1: (response[0].childIds[0] && await getData(response[0].childIds[0])),
+                    child2: (response[0].childIds[1] && await getData(response[0].childIds[1]))
+                }
+                resolve(userdata)
             }
-            resolve(userdata)
+            else{
+                userdata = {
+                    name:response[0].name,
+                    id:response[0]._id,
+                    child1: (response[0].childUpgraded[0] && await getData2(response[0].childUpgraded[0],response[0].childUpgraded[2],response[0].childUpgraded[3])),
+                    child2: (response[0].childUpgraded[1] && await getData2(response[0].childUpgraded[1],response[0].childUpgraded[4],response[0].childUpgraded[5])),
+                }
+                resolve(userdata)
+            }
         })
     })
 }
-
+//Get child datas for stage 1 
 function getData(data1){
     if(typeof data1!=undefined){
     return new Promise(async (res,rej) => {
         await User.find({_id:data1.userId},async (err,docc) => {
             childData = {
-                name: docc[0].name.substring(0,3)+'*******',
+                name: docc[0].name+' '+docc[0].lastname.substring(0,2)+'*******',
                 child1: await getchildInfo(docc[0].childIds[0]),
                 child2: await getchildInfo(docc[0].childIds[1])
             }
@@ -591,19 +602,48 @@ function getData(data1){
     }
 }
 
+//Get child datas for stage 2 + 
+function getData2(data1,data2,data3){
+    if(typeof data1!=undefined){
+    return new Promise(async (res,rej) => {
+        await User.find({_id:data1.userId},async (err,docc) => {
+            childData = {
+                name: docc[0].name+' '+docc[0].lastname.substring(0,2)+'*******',
+                child1: (data2 && data2.userId && await getchildInfo2(data2.userId)),
+                child2: (data3 && data3.userId && await getchildInfo2(data3.userId))
+            }
+            res(childData)
+        })
+    })
+    }
+}
+//Get children info
 function getchildInfo(data2){
     if(data2!=undefined){
         return new Promise(async (res,rej) => {
             await User.find({_id:data2.userId},(err,docc1) => {
                 var childData = {
-                    name: docc1[0].name.substring(0,3)+'*******'
+                    name: docc1[0].name+' '+docc1[0].lastname.substring(0,2)+'*******'
                 }
                 res(childData)
             })
         })
     }
-    }
+}
 
+//Get children info
+function getchildInfo2(data2){
+    if(data2!=undefined){
+        return new Promise(async (res,rej) => {
+            await User.find({_id:data2},(err,docc1) => {
+                var childData = {
+                    name: docc1[0].name+' '+docc1[0].lastname.substring(0,2)+'*******'
+                }
+                res(childData)
+            })
+        })
+    }
+}
 // @route POST api/users/getTransaction/userid
 // @desc Get user
 // @access Public

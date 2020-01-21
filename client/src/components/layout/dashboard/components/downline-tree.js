@@ -45,43 +45,46 @@ class downtree extends Component {
                             <div className="tree">
                                 <ul>
                                     <li>
-                                        <Link to="">
+                                        <a>
                                             <div className="container-fluid">
                                                 <div className="row">
                                                     Me
                                                 </div>
                                             </div>
-                                        </Link>
+                                        </a>
                                     {userDataAll.child1 && (
                                         <ul>
                                             <li>
-                                                <Link to="">
+                                                <a>
                                                     <div className="container-fluid">
                                                         <div className="row">
+                                                            <img src={require('../../images/001-user.png')} alt='user'/>
                                                             {userDataAll.child1.name}
                                                         </div>
                                                     </div>
-                                                </Link>
+                                                </a>
                                                 {userDataAll.child1.child1 && (
                                                     <ul>
                                                         <li>
-                                                            <Link to="">
+                                                            <a>
                                                                 <div className="container-fluid">
                                                                     <div className="row">
+                                                                        <img src={require('../../images/001-user.png')} alt='user'/>
                                                                         {userDataAll.child1.child1.name}
                                                                     </div>
                                                                 </div>
-                                                            </Link>
+                                                            </a>
                                                         </li>
                                                 {userDataAll.child1.child2 && (
                                                         <li>
-                                                            <Link to="">
+                                                            <a>
                                                                 <div className="container-fluid">
                                                                     <div className="row">
+                                                                        <img src={require('../../images/001-user.png')} alt='user'/>
                                                                         {userDataAll.child1.child2.name}
                                                                     </div>
                                                                 </div>
-                                                            </Link>
+                                                            </a>
                                                         </li>
                                                 )}
                                                 </ul>
@@ -89,33 +92,36 @@ class downtree extends Component {
                                             </li>
                                             {userDataAll.child2 && (
                                         <li>
-                                            <Link to="">
+                                            <a>
                                                 <div className="container-fluid">
                                                     <div className="row">
+                                                        <img src={require('../../images/001-user.png')} alt='user'/>
                                                         {userDataAll.child2.name}
                                                     </div>
                                                 </div>
-                                            </Link>
+                                            </a>
                                             {userDataAll.child2.child1 && (
                                                 <ul>
                                                     <li>
-                                                        <Link to="">
+                                                        <a>
                                                             <div className="container-fluid">
                                                                 <div className="row">
+                                                                    <img src={require('../../images/001-user.png')} alt='user'/>
                                                                     {userDataAll.child2.child1.name}
                                                                 </div>
                                                             </div>
-                                                        </Link>
+                                                        </a>
                                                     </li>
                                             {userDataAll.child2.child2 && (
                                                     <li>
-                                                        <Link to="">
+                                                        <a>
                                                             <div className="container-fluid">
                                                                 <div className="row">
+                                                                    <img src={require('../../images/001-user.png')} alt='user'/>
                                                                     {userDataAll.child2.child2.name}
                                                                 </div>
                                                             </div>
-                                                        </Link>
+                                                        </a>
                                                     </li>
                                             )}
                                             </ul>

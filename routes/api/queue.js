@@ -129,13 +129,22 @@ var searched = new Stack();
         console.log(finalEles)
         if(finalEles.length===5 && isChildSameStage){
             var x = await getAdminResult();
-            var updateUser = await User.findOneAndUpdate({_id:parent},{$set:{stage:2,wallet:x.lvl1depfin},
+            var updateUser = await User.findOneAndUpdate({_id:parent},{$set:{stage:2},
                 $push:{
-                    transactions:{          
+                    transactions:[{          
                         name:"Referral",
                         type:"Deposit",
-                        amount:'+'+2*x.lvl1depfin
-                    }
+                        amount:'+'+3*x.lvl1depfin
+                    },
+                    {          
+                        name:"Deposit",
+                        type:"Deposit",
+                        amount:'-'+x.lvl1depfin
+                    }]
+                },
+                $inc:{
+                    wallet:(3*x.lvl1depfin)-(x.lvl1depfin),
+                    "payout.eligible":(3*x.lvl1depfin)-(x.lvl1depfin)
                 }
             },{useFindAndModify:false});
             var checkUpgrade = await doStageOperation(updateUser);
@@ -201,18 +210,21 @@ async function doStageOperation(user){
     console.log(_id)
     var userInfo = await User.findOne({_id});
     var userParent = userInfo.parentId;
+    console.log(userParent)
     if(userParent !== null){
+        console.log('hello')
         var parentInfo = await User.findOne({_id:userParent});
         var getChildUpgraded = parentInfo.childUpgraded;
-        if(typeof getChildUpgraded === 'undefined'){
-        var updateInfo = User.findOneAndUpdate({_id:userParent},{$push:{
+        console.log(getChildUpgraded.length);
+        if(getChildUpgraded.length < 5){
+        var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
             }
         }})
         }
         else if(getChildUpgraded.length === 5){
-        var updateInfo = User.findOneAndUpdate({_id:userParent},{$push:{
+        var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
             }
@@ -222,7 +234,7 @@ async function doStageOperation(user){
         console.log(upgradeParentx);
         }
         else if(getChildUpgraded.length === 6){
-        var updateInfo = User.findOneAndUpdate({_id:userParent},{$set:{
+        var updateInfo = await User.findOneAndUpdate({_id:userParent},{$set:{
             childUpgraded:{
                 userId:user._id
             }
@@ -238,19 +250,23 @@ async function upgradeParent(_id){
     var x = await getAdminResult();
     var upgraded = await User.findOneAndUpdate({_id},{$inc:
         {
-            stage:1
+            stage:1,
+            wallet:(3*x.lvl1depfin)-(x.lvl1depfin),
+            "payout.eligible":(3*x.lvl1depfin)-(x.lvl1depfin)
         }
     },
     {
-        $set:{wallet:x.lvl1depfin}
-    },
-    {
         $push:{
-            transactions:{          
+            transactions:[{   
                 name:"Referral",
                 type:"Deposit",
                 amount:'+'+3*x.lvl1depfin
-            }
+            },
+            {          
+                name:"Deposit",
+                type:"Deposit",
+                amount:'-'+x.lvl1depfin
+            }]
         }
     }
     );

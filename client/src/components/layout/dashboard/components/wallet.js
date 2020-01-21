@@ -98,7 +98,12 @@ function generateCards() {
 						output += "<div class='transaction-item_amount'><span style='margin-right:10px;'>₹</span><p class='amount'>"+ cards[i].transactions[n].amount +"</p></div>";
 						output += "</div>";
 						//for transaction length add amounts to total 
+						if((cards[i].transactions[n].name).toLowerCase() === 'initial deposit'){
+						total += 0;
+						}
+						else{
 						total += parseFloat(cards[i].transactions[n].amount);
+						}
 					}
 					document.querySelector('.transactions').innerHTML = output;
 					document.querySelector('.total-balance').innerHTML = total.toFixed(2); //2 decimal places
