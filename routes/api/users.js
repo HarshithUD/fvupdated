@@ -570,7 +570,7 @@ function getUserData(userid){
     let child1 = [];
     return new Promise((resolve,reject) => {
         User.find({_id:userid},async (err,response) => {
-            if((response[0].stage === 1) && response[0].level === 1){
+            if((response[0].stage === 1)){
                 userdata = {
                     name:response[0].name,
                     id:response[0]._id,
