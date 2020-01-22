@@ -187,7 +187,12 @@ router.post('/register',async (req,res) => {
                 // }) ** OTP DISABLED
                 NewUser
                 .save()
-                .then(user => res.json(user))
+                .then(user => {
+                    var message = "Congrats, "+user.name+" you are successfully registered in Fortune Vision with your Email/Mobile-Number and your Chosen Password , Visit us at https://fortunevision.in";
+                    request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+user.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
+                    res.json(user)
+                }
+                )
                 .catch(err => console.log(err))
                 
                 

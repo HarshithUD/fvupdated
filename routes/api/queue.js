@@ -37,7 +37,7 @@ router.get('/approve/:userid',async (request,response) => {
     var referrerInfo = await User.findOne({_id:userid});
     var referrer = referrerInfo.referrer;
     if(typeof referrer === 'undefined'){
-        result = {
+        let result = {
             error:true,
             message:'No refferrals'
         }
@@ -47,6 +47,13 @@ router.get('/approve/:userid',async (request,response) => {
         var count = await countUsers();
         if(count!==0){
             var referrerDetails = await User.findOne({referralId:referrer});
+            if(referrerDetails === null){
+                let result = {
+                    error:true,
+                    message:'Referrer Not found'
+                }
+                response.send(result);
+            }
             const referrerData = {
                 childIds:referrerDetails.childIds,
                 parentId:referrerDetails._id
@@ -82,6 +89,7 @@ async function checkAncestors(userid){
     var parentToCheck = userid;
     var checked = [];
     let getAncestorId = await checkForParent(parentToCheck);
+    console.log(getAncestorId);
     if(getAncestorId!==null){
         while(getAncestorId!==null){
             checked.push(getAncestorId);
@@ -127,6 +135,7 @@ var searched = new Stack();
         var isChildSameStage = childrensAt.every(isSameStage);
         console.log(isChildSameStage);
         console.log(finalEles)
+        var updateRef = await updateReff(parent);
         if(finalEles.length===5 && isChildSameStage){
             var x = await getAdminResult();
             var updateUser = await User.findOneAndUpdate({_id:parent},{$set:{stage:2},
@@ -147,7 +156,9 @@ var searched = new Stack();
                     "payout.eligible":(3*x.lvl1depfin)-(x.lvl1depfin)
                 }
             },{useFindAndModify:false});
-            var checkUpgrade = await doStageOperation(updateUser);
+            var checkUpgrade = await doStageOperation(updateUser)
+            const message = "Congrats! Your wallet balance is updated with +"+ 3*x.lvl1depfin +"Refferral funds.";
+            request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+updateUser.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
             console.log(updateUser)
         }
         else if(!isChildSameStage){
@@ -207,6 +218,8 @@ async function checkForParent(userId){
 //Stage Upgrade
 async function doStageOperation(user){
     var _id = user._id;
+    var x = await getAdminResult();
+    let refBonus = (x.lvl1depfin)/2;
     console.log(_id)
     var userInfo = await User.findOne({_id});
     var userParent = userInfo.parentId;
@@ -220,6 +233,11 @@ async function doStageOperation(user){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
+            },
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
             }
         }})
         }
@@ -227,6 +245,11 @@ async function doStageOperation(user){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
+            },
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
             }
         }})
         //Upgrade parent
@@ -237,6 +260,11 @@ async function doStageOperation(user){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$set:{
             childUpgraded:{
                 userId:user._id
+            },
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
             }
         }})
         }
@@ -270,6 +298,8 @@ async function upgradeParent(_id){
         }
     }
     );
+    const message = "Congrats! Your wallet balance is updated with +"+ 3*x.lvl1depfin +"Refferral funds.";
+    request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+upgraded.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
     if(upgraded.parentId !== 'null' || typeof upgraded !== 'undefined'){
         var res = await doStageOperation(upgraded.parentId);
         console.log(res);
@@ -290,11 +320,12 @@ async function QueueOperations(referrerData,userid){
         //Get Admin data
         const adminData = await getAdminResult();
         var initialDeposit = adminData.lvl1depfin;
+        var refBonus = (adminData.lvl1depfin)/2;
         //Enter the Queue Not necc
         // Code Later
 
         // Add user to the Parent
-        User.findByIdAndUpdate({_id:userid},{$set:{
+        await User.findByIdAndUpdate({_id:userid},{$set:{
             action:true,
             parentId:referrerData.parentId,
             transactions: {
@@ -311,14 +342,45 @@ async function QueueOperations(referrerData,userid){
                     childIds:{
                         userId:result._id
                     }
-                }},{useFindAndModify:false},(err,res)=>{
+                }},{useFindAndModify:false},async (err,res)=>{
                     if(err){console.log(err)}
+                    else{
+                        if(res.stage === 1){
+                            await User.findOneAndUpdate({_id:res._id},{
+                                $push:{
+                                transactions: {
+                                    name:"Referral Joined",
+                                    type:"Deposit",
+                                    amount:'+'+refBonus
+                                }
+                            }
+                            },{useFindAndModify:false})
+                        }
+                    }
                 })
             }
         }
+        }).then(res => {
+            const message = "Congrats! Your wallet balance is updated with the deposit amount.";
+            request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+res.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
         })
     }
 
+}
+
+//Update ref balance
+async function updateReff(_id){
+    const adminData = await getAdminResult();
+    var refBonus = (adminData.lvl1depfin)/2;
+    await User.findOneAndUpdate({_id},{
+        $push:{
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
+            }
+        }
+    },{useFindAndModify:false});
 }
 
 

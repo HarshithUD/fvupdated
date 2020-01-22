@@ -101,6 +101,9 @@ function generateCards() {
 						if((cards[i].transactions[n].name).toLowerCase() === 'initial deposit'){
 						total += 0;
 						}
+						else if((cards[i].transactions[n].name).toLowerCase() === 'referral joined'){
+						total += 0;
+						}
 						else{
 						total += parseFloat(cards[i].transactions[n].amount);
 						}
