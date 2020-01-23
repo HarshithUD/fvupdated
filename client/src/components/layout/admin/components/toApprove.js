@@ -120,6 +120,14 @@ class toApprove extends Component{
                 "</ul></td>" +
                 "</tr>" +
                 "<tr>" +
+                "<td>Referral Id</td>" +
+                "<td>"+user.referralId+"</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td>Referrer</td>" +
+                "<td>"+user.referrer+"</td>" +
+                "</tr>" +
+                "<tr>" +
                 "<td>PAN number</td>" +
                 "<td>"+user.pan+"</td>" +
                 "</tr>" +

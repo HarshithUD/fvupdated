@@ -20,6 +20,7 @@ import Downtree from "./components/layout/dashboard/components/downline-tree";
 import Settings from "./components/layout/admin/components/settings";
 import Approve from './components/layout/admin/components/toApprove'
 import Approved from './components/layout/admin/components/approvedUser'
+import AdminDowntree from './components/layout/admin/components/downtree'
 import Activate from './components/layout/admin/components/activate'
 import Declined from './components/layout/admin/components/declined'
 import PayoutEli from './components/layout/admin/components/eligibleforpay'
@@ -73,6 +74,7 @@ class App extends Component {
       <PrivateRouteAdmin exact path="/admin/payout-eligible" component={PayoutEli} />
       <PrivateRouteAdmin exact path="/admin/transaction-details" component={Transation} />
       <PrivateRouteAdmin exact path="/admin/transaction-detail" component={TransationDetails} />
+      <PrivateRouteAdmin exact path="/admin/downtree" component={AdminDowntree} />
     </Switch>
     </Router>
     </Provider>

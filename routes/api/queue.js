@@ -327,6 +327,7 @@ async function QueueOperations(referrerData,userid){
         // Add user to the Parent
         await User.findByIdAndUpdate({_id:userid},{$set:{
             action:true,
+            level:'silver',
             parentId:referrerData.parentId,
             transactions: {
             name:"Initial Deposit",

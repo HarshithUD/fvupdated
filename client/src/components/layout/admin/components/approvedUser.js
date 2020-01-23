@@ -94,6 +94,14 @@ class approved extends Component{
                 "</ul></td>" +
                 "</tr>" +
                 "<tr>" +
+                "<td>Referral ID</td>" +
+                "<td>"+user.referralId+"</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td>Referrer</td>" +
+                "<td>"+user.referrer+"</td>" +
+                "</tr>" +
+                "<tr>" +
                 "<td>PAN number</td>" +
                 "<td>"+user.pan+"</td>" +
                 "</tr>" +
@@ -214,6 +222,16 @@ render() {
                 sort: 'asc'
             },
             {
+                label: 'Stage',
+                field: 'stage',
+                sort: 'asc'
+            },
+            {
+                label: 'Level',
+                field: 'level',
+                sort: 'asc'
+            },
+            {
                 label: 'Date',
                 field: 'date',
                 sort: 'asc'
@@ -240,6 +258,8 @@ render() {
                 slno:++count,
                 name:data1.name,
                 email:data1.email,
+                stage:data1.all.stage,
+                level:<span class="badge badge-secondary" style={{fontSize:'13px',fontWeight:'400'}}>{data1.all.level}</span>,
                 date:data1.date,
                 action:<div><button type="button" className="btn btn-primary" onClick={() => this.viewDetails(data1.all)}>View Details</button>
                 </div>

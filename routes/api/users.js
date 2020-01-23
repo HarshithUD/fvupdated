@@ -555,6 +555,21 @@ router.get('/getAdminDetails/:userid', (req,res) => {
     })
 })
 
+// @route POST api/users/getAllTree/
+// @desc Get users tree
+// @access Public
+router.get('/getAllTree', async (req,res) => {
+    var ObjectId = require('mongoose').Types.ObjectId; 
+    var parentUser = await User.findOne({_id:new ObjectId('5e25f3f2536a4b0017c5136e')});
+    // while(parentUser.childIds.length > 0){
+    //     for(i=0;i<parentUser.childIds.length;i++){
+    //         var getChilds = await User.findOne({_id:parentUser.childIds[i].userId})
+    //     }
+    // }
+    res.send('test')
+})
+
+
 // @route POST api/users/getTree/userid
 // @desc Get user
 // @access Public

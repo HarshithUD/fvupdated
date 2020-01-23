@@ -61,6 +61,14 @@ class DataTable extends Component{
                 "<td>"+useraddress+"</td>" +
                 "</tr>" +
                 "<tr>" +
+                "<td>Referral Id</td>" +
+                "<td>"+user.referralId+"</td>" +
+                "</tr>" +
+                "<tr>" +
+                "<td>Referrer</td>" +
+                "<td>"+user.referrer+"</td>" +
+                "</tr>" +
+                "<tr>" +
                 "<td>PAN number</td>" +
                 "<td>"+user.pan+"</td>" +
                 "</tr>" +

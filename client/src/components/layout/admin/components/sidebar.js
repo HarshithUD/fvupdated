@@ -91,6 +91,12 @@ class adminsidebar extends Component {
                     </Link>
                   </li>
                   <li>
+                    <Link to="/admin/downtree">
+                      <i className="fa fa-cog"></i>
+                      <span>User Tree</span>
+                    </Link>
+                  </li>
+                  <li>
                     <Link to="/admin/activate-users" >
                       <i className="fa fa-plus-circle"></i>
                       <span>Activate Users</span>
