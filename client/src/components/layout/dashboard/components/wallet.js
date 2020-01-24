@@ -32,7 +32,8 @@ class wallet extends Component {
 				accnumber: a.accnumber,
 				bankuser: a.bankuser,
 				ifsc: a.ifsc,
-				transactions: a.transactions
+				transactions: a.transactions,
+				wallet:a.wallet
 			}
 		];
 		this.setState({
@@ -98,15 +99,16 @@ function generateCards() {
 						output += "<div class='transaction-item_amount'><span style='margin-right:10px;'>₹</span><p class='amount'>"+ cards[i].transactions[n].amount +"</p></div>";
 						output += "</div>";
 						//for transaction length add amounts to total 
-						if((cards[i].transactions[n].name).toLowerCase() === 'initial deposit'){
-						total += 0;
-						}
-						else if((cards[i].transactions[n].name).toLowerCase() === 'referral joined'){
-						total += 0;
-						}
-						else{
-						total += parseFloat(cards[i].transactions[n].amount);
-						}
+						// if((cards[i].transactions[n].name).toLowerCase() === 'initial deposit'){
+						// total += 0;
+						// }
+						// else if((cards[i].transactions[n].name).toLowerCase() === 'referral joined'){
+						// total += 0;
+						// }
+						// else{
+						// total += parseFloat(cards[i].transactions[n].amount);
+						// }
+						total = parseFloat(cards[i].wallet);
 					}
 					document.querySelector('.transactions').innerHTML = output;
 					document.querySelector('.total-balance').innerHTML = total.toFixed(2); //2 decimal places

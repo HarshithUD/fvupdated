@@ -226,6 +226,10 @@ async function doStageOperation(user,user2){
     if(userParent !== null){
         var parentInfo = await User.findOne({_id:userParent});
         var getChildUpgraded = parentInfo.childUpgraded;
+        var getMainUserInfo = await User.findOne({_id:user._id});
+        var x1 = userInfo.stage;
+        console.log(x1);
+        if(getMainUserInfo.stage === x1){
         if(getChildUpgraded.length < 5){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
@@ -239,6 +243,7 @@ async function doStageOperation(user,user2){
         }})
         }
         else if(getChildUpgraded.length === 5){
+            console.log('heree')
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
@@ -268,6 +273,7 @@ async function doStageOperation(user,user2){
         }},
         )
         }
+    }
         if( parentInfo.parentId !== null ){
             var stagOp = await doStageOperation(user,parentInfo._id);
             console.log('here');
@@ -280,6 +286,8 @@ async function doStageOperation(user,user2){
 async function upgradeParent(_id){
     console.log(_id)
     var x = await getAdminResult();
+    var xxx = await getUserStage(_id);
+    if(xxx < 6){
     var upgraded = await User.findOneAndUpdate({_id},{$inc:
         {
             stage:1,
@@ -309,6 +317,14 @@ async function upgradeParent(_id){
         console.log(res);
     }
     return upgraded;
+}else{
+    var upgraded = await User.findOneAndUpdate({_id},{$inc:
+        {
+            wallet:(3*x.lvl1depfin)-(x.lvl1depfin)
+        }
+    },{useFindAndModify:false})
+    return upgraded;
+}
 }
 
 //Queue Operations
@@ -400,7 +416,8 @@ async function reset(){
             transactions:[],
             wallet:0,
             childUpgraded:[],
-            stage:1
+            stage:1,
+            'payout.eligible':0
         }
     },(err,res) => {
         if(err)console.log(err);
