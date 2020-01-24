@@ -156,7 +156,7 @@ var searched = new Stack();
                     "payout.eligible":(3*x.lvl1depfin)-(x.lvl1depfin)
                 }
             },{useFindAndModify:false});
-            var checkUpgrade = await doStageOperation(updateUser)
+            var checkUpgrade = await doStageOperation(updateUser,updateUser)
             const message = "Congrats! Your wallet balance is updated with +"+ 3*x.lvl1depfin +"Refferral funds.";
             request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+updateUser.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
             console.log(updateUser)
@@ -216,19 +216,16 @@ async function checkForParent(userId){
 }
 
 //Stage Upgrade
-async function doStageOperation(user){
+async function doStageOperation(user,user2){
     var _id = user._id;
     var x = await getAdminResult();
     let refBonus = (x.lvl1depfin)/2;
     console.log(_id)
-    var userInfo = await User.findOne({_id});
+    var userInfo = await User.findOne({_id:user2._id});
     var userParent = userInfo.parentId;
-    console.log(userParent)
     if(userParent !== null){
-        console.log('hello')
         var parentInfo = await User.findOne({_id:userParent});
         var getChildUpgraded = parentInfo.childUpgraded;
-        console.log(getChildUpgraded.length);
         if(getChildUpgraded.length < 5){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
@@ -260,13 +257,20 @@ async function doStageOperation(user){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$set:{
             childUpgraded:{
                 userId:user._id
-            },
+            }
+        },
+        $push:{
             transactions: {
                 name:"Referral Joined",
                 type:"Deposit",
                 amount:'+'+refBonus
             }
-        }})
+        }},
+        )
+        }
+        if( parentInfo.parentId !== null ){
+            var stagOp = await doStageOperation(user,parentInfo._id);
+            console.log('here');
         }
     }
     return;
@@ -301,7 +305,7 @@ async function upgradeParent(_id){
     const message = "Congrats! Your wallet balance is updated with +"+ 3*x.lvl1depfin +"Refferral funds.";
     request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+upgraded.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
     if(upgraded.parentId !== 'null' || typeof upgraded !== 'undefined'){
-        var res = await doStageOperation(upgraded.parentId);
+        var res = await doStageOperation(upgraded,upgraded);
         console.log(res);
     }
     return upgraded;
@@ -382,6 +386,26 @@ async function updateReff(_id){
             }
         }
     },{useFindAndModify:false});
+}
+
+setTimeout( () => {
+    // reset();
+},3000)
+
+async function reset(){
+    User.updateMany({},{
+        $set:{
+            action:false,
+            childIds:[],
+            transactions:[],
+            wallet:0,
+            childUpgraded:[],
+            stage:1
+        }
+    },(err,res) => {
+        if(err)console.log(err);
+        console.log(res)
+    })
 }
 
 
