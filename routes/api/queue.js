@@ -89,7 +89,6 @@ async function checkAncestors(userid){
     var parentToCheck = userid;
     var checked = [];
     let getAncestorId = await checkForParent(parentToCheck);
-    console.log(getAncestorId);
     if(getAncestorId!==null){
         while(getAncestorId!==null){
             checked.push(getAncestorId);
@@ -133,8 +132,6 @@ var searched = new Stack();
     if(checkPstages===1){
         var childrensAt = await checkAllChildren(finalEles);
         var isChildSameStage = childrensAt.every(isSameStage);
-        console.log(isChildSameStage);
-        console.log(finalEles)
         var updateRef = await updateReff(parent);
         if(finalEles.length===5 && isChildSameStage){
             var x = await getAdminResult();
@@ -162,10 +159,8 @@ var searched = new Stack();
             console.log(updateUser)
         }
         else if(!isChildSameStage){
-            console.log("Not")
         }
         else{
-            console.log(finalEles.length)
         }
     }
     return finalEles;
@@ -220,7 +215,6 @@ async function doStageOperation(user,user2){
     var _id = user._id;
     var x = await getAdminResult();
     let refBonus = (x.lvl1depfin)/2;
-    console.log(_id)
     var userInfo = await User.findOne({_id:user2._id});
     var userParent = userInfo.parentId;
     if(userParent !== null){
@@ -228,7 +222,6 @@ async function doStageOperation(user,user2){
         var getChildUpgraded = parentInfo.childUpgraded;
         var getMainUserInfo = await User.findOne({_id:user._id});
         var x1 = userInfo.stage;
-        console.log(x1);
         if(getMainUserInfo.stage === x1){
         if(getChildUpgraded.length < 5){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
@@ -243,7 +236,6 @@ async function doStageOperation(user,user2){
         }})
         }
         else if(getChildUpgraded.length === 5){
-            console.log('heree')
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$push:{
             childUpgraded:{
                 userId:user._id
@@ -256,7 +248,13 @@ async function doStageOperation(user,user2){
         }})
         //Upgrade parent
         let upgradeParentx = await upgradeParent(userParent);
-        console.log(upgradeParentx);
+        // remember his ancestors too
+        if( parentInfo.parentId !== null ){
+            if(user.stage === parentInfo.stage){
+                var stagOp = await doStageOperation(user,parentInfo._id);
+            }
+        }
+        // ********
         }
         else if(getChildUpgraded.length === 6){
         var updateInfo = await User.findOneAndUpdate({_id:userParent},{$set:{
@@ -274,17 +272,12 @@ async function doStageOperation(user,user2){
         )
         }
     }
-        if( parentInfo.parentId !== null ){
-            var stagOp = await doStageOperation(user,parentInfo._id);
-            console.log('here');
-        }
     }
     return;
 }
 
 //upgrade parent
 async function upgradeParent(_id){
-    console.log(_id)
     var x = await getAdminResult();
     var xxx = await getUserStage(_id);
     if(xxx < 6){
@@ -314,7 +307,6 @@ async function upgradeParent(_id){
     request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+upgraded.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
     if(upgraded.parentId !== 'null' || typeof upgraded !== 'undefined'){
         var res = await doStageOperation(upgraded,upgraded);
-        console.log(res);
     }
     return upgraded;
 }else{
@@ -421,7 +413,6 @@ async function reset(){
         }
     },(err,res) => {
         if(err)console.log(err);
-        console.log(res)
     })
 }
 

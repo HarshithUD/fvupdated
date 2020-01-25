@@ -233,6 +233,14 @@ class toApprove extends Component{
           }
     }
 
+    // approveAll = async () => {
+    //   var x = this.state.userDetail;
+    //   for(let i=0;i<x.length;i++){
+    //     var xxxx = await this.approveUser(x[i].all);
+    //     console.log(xxxx)
+    //   }
+    // }
+
     depositMoney = (user) => {
         Swal.fire({
             title: 'Enter the amount to deposit',
@@ -360,6 +368,7 @@ render() {
       <main className="page-content">
       <div className="container-fluid">
       <h3>Approve Users</h3>
+      {/* <button type="button" className="btn btn-danger" onClick={() => this.approveAll()}>Approve All</button> */}
       <hr></hr>
       <div class="exportCsv">
       <CSVLink data={data2} filename={filename} ><button type="button" className="btn btn-primary" >Export to CSV</button></CSVLink>
