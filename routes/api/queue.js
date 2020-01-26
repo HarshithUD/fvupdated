@@ -58,9 +58,10 @@ router.get('/approve/:userid',async (request,response) => {
                 childIds:referrerDetails.childIds,
                 parentId:referrerDetails._id
             }
-            const checkParentDesc = await checkAncestors(referrerDetails._id);
-            const result = await QueueOperations(referrerData,userid);
-            response.send(result);
+            // var getUserLevlStage = await getStageNLevel(userid);
+                const checkParentDesc = await checkAncestors(referrerDetails._id);
+                const result = await QueueOperations(referrerData,userid);
+                response.send(result);
         }
         else if(count === 0){
             // var referrerDetails = await User.findOne({referralId:referrer});
@@ -74,9 +75,14 @@ router.get('/approve/:userid',async (request,response) => {
     }
 })
 
-setTimeout(() => {
-    // countUsers('5e1d4cb53dddf2032c8e15fe');
-}, 3000);
+async function getStageNLevel(_id){
+    var res = await User.findOne({_id});
+    let userIn = {
+        stage:res.stage,
+        level:res.level
+    }
+    return userIn;
+}
 
 async function countUsers(){
     var a = await User.find({action:true});
@@ -250,9 +256,7 @@ async function doStageOperation(user,user2){
         let upgradeParentx = await upgradeParent(userParent);
         // remember his ancestors too
         if( parentInfo.parentId !== null ){
-            if(user.stage === parentInfo.stage){
                 var stagOp = await doStageOperation(user,parentInfo._id);
-            }
         }
         // ********
         }
@@ -309,13 +313,16 @@ async function upgradeParent(_id){
         var res = await doStageOperation(upgraded,upgraded);
     }
     return upgraded;
-}else{
+}else if(xxx < 10){
     var upgraded = await User.findOneAndUpdate({_id},{$inc:
         {
             wallet:(3*x.lvl1depfin)-(x.lvl1depfin)
         }
     },{useFindAndModify:false})
     return upgraded;
+}
+else if(xxx === 10){
+    await AdvanceL2(_id);
 }
 }
 
@@ -395,6 +402,255 @@ async function updateReff(_id){
         }
     },{useFindAndModify:false});
 }
+
+async function getOneDet(_id){
+    var hisDet = await User.findOne({_id});
+    return hisDet;
+}
+
+// Level 2 Operations ------------------------
+async function AdvanceL2(_id){
+    var getUser = await User.findOneAndUpdate({_id},{
+        $set:{stage:1,level:'gold'}
+    },{useFindAndModify:false});
+    var getUserStage = await getOneDet(_id);
+    var ancestorProcess = await ancProcess(_id,getUserStage);
+}
+
+async function ancProcess(_id,user){
+    var getParent = await User.findOne({_id});
+    var parent = getParent.parentId;
+
+    while(parent != null){ 
+        var dets = await getOneDet(parent);
+        if(dets.level === 'gold'){
+            var userStage = await getOneDet(parent);
+            if(userStage === user.stage){
+                var upgradedId = await RemUpgrade(_id,user);
+            }
+        }
+    }
+}
+
+//Remember upgrade
+async function RemUpgrade(_id,user){
+    var x = await getAdminResult();
+    let refBonus = (x.lvl2depfin)/2;
+    var dets = await getOneDet(_id);
+    if(childUpgraded.length < 5){
+        var addChild = await findOneAndUpdate({_id},{
+            $push:{
+                childUpgraded:{
+                    userId:user._id
+                },
+                transactions: {
+                    name:"Referral Joined",
+                    type:"Deposit",
+                    amount:'+'+refBonus
+                }
+            }
+        },{useFindAndModify:false});
+    }
+    else if(childUpgraded.length === 5){
+        var updateInfo = await User.findOneAndUpdate({_id},{$push:{
+            childUpgraded:{
+                userId:user._id
+            },
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
+            }
+        }})
+        //Upgrade parent
+        let upgradeParentL2 = await upgradeParentL2(_id);
+        // remember his ancestors too
+        if( parentInfo.parentId !== null ){
+                var stagOp = await ancProcess(_id,user);
+        }
+        // ********
+        }
+        else if(childUpgraded.length === 6){
+        var updateInfo = await User.findOneAndUpdate({_id},{$set:{
+            childUpgraded:{
+                userId:user._id
+            }
+        },
+        $push:{
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
+            }
+        }},
+        )
+        }
+}
+
+//upgrade level 2 parent
+async function upgradeParentL2(_id){
+    var x = await getAdminResult();
+    var xxx = await getUserStage(_id);
+    if(xxx < 6){
+    var upgraded = await User.findOneAndUpdate({_id},{$inc:
+        {
+            stage:1,
+            wallet:(3*x.lvl2depfin)-(x.lvl2depfin),
+            "payout.eligible":(3*x.lvl2depfin)-(x.lvl2depfin)
+        }
+    },
+    {
+        $push:{
+            transactions:[{   
+                name:"Referral",
+                type:"Deposit",
+                amount:'+'+3*x.lvl2depfin
+            },
+            {          
+                name:"Deposit",
+                type:"Deposit",
+                amount:'-'+x.lvl2depfin
+            }]
+        }
+    }
+    );
+    const message = "Congrats! Your wallet balance is updated with +"+ 3*x.lvl2depfin +"Refferral funds.";
+    request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+upgraded.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
+    if(upgraded.parentId !== 'null' || typeof upgraded !== 'undefined'){
+        var res = await ancProcess(upgraded,upgraded);
+    }
+    return upgraded;
+}else if(xxx<10){
+    var upgraded = await User.findOneAndUpdate({_id},{$inc:
+        {
+            wallet:(3*x.lvl2depfin)-(x.lvl2depfin)
+        }
+    },{useFindAndModify:false})
+    return upgraded;
+}
+else if(xxx === 10){
+    await AdvanceL3(_id);
+}
+}
+
+//Level 3 advance -------------------
+async function AdvanceL3(_id){
+    var getUser = await User.findOneAndUpdate({_id},{
+        $set:{stage:1,level:'sapphire'}
+    },{useFindAndModify:false});
+    var getUserStage = await getOneDet(_id);
+    var ancestorProcess = await ancProcessL3(_id,getUserStage);
+}
+
+async function ancProcessL3(_id,user){
+    var getParent = await User.findOne({_id});
+    var parent = getParent.parentId;
+
+    while(parent != null){ 
+        var dets = await getOneDet(parent);
+        if(dets.level === 'sapphire'){
+            var userStage = await getOneDet(parent);
+            if(userStage === user.stage){
+                var upgradedId = await RemUpgradeL3(_id,user);
+            }
+        }
+    }
+}
+
+//Remember upgrade
+async function RemUpgradeL3(_id,user){
+    var x = await getAdminResult();
+    let refBonus = (x.lvl3depfin)/2;
+    var dets = await getOneDet(_id);
+    if(childUpgraded.length < 5){
+        var addChild = await findOneAndUpdate({_id},{
+            $push:{
+                childUpgraded:{
+                    userId:user._id
+                },
+                transactions: {
+                    name:"Referral Joined",
+                    type:"Deposit",
+                    amount:'+'+refBonus
+                }
+            }
+        },{useFindAndModify:false});
+    }
+    else if(childUpgraded.length === 5){
+        var updateInfo = await User.findOneAndUpdate({_id},{$push:{
+            childUpgraded:{
+                userId:user._id
+            },
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
+            }
+        }})
+        //Upgrade parent
+        let upgradeParentL2 = await upgradeParentL3(_id);
+        // remember his ancestors too
+        if( parentInfo.parentId !== null ){
+                var stagOp = await ancProcessL3(_id,user);
+        }
+        // ********
+        }
+        else if(childUpgraded.length === 6){
+        var updateInfo = await User.findOneAndUpdate({_id},{$set:{
+            childUpgraded:{
+                userId:user._id
+            }
+        },
+        $push:{
+            transactions: {
+                name:"Referral Joined",
+                type:"Deposit",
+                amount:'+'+refBonus
+            }
+        }},
+        )
+        }
+}
+
+//upgrade level 2 parent
+async function upgradeParentL3(_id){
+    var x = await getAdminResult();
+    var xxx = await getUserStage(_id);
+    if(xxx < 6){
+    var upgraded = await User.findOneAndUpdate({_id},{$inc:
+        {
+            stage:1,
+            wallet:(3*x.lvl3depfin)-(x.lvl3depfin),
+            "payout.eligible":(3*x.lvl3depfin)-(x.lvl3depfin)
+        }
+    },
+    {
+        $push:{
+            transactions:[{   
+                name:"Referral",
+                type:"Deposit",
+                amount:'+'+3*x.lvl3depfin
+            },
+            {          
+                name:"Deposit",
+                type:"Deposit",
+                amount:'-'+x.lvl3depfin
+            }]
+        }
+    }
+    );
+    const message = "Congrats! Your wallet balance is updated with +"+ 3*x.lvl3depfin +"Refferral funds.";
+    request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+upgraded.number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
+    if(upgraded.parentId !== 'null' || typeof upgraded !== 'undefined'){
+        var res = await ancProcessL3(upgraded,upgraded);
+    }
+    return upgraded;
+}
+}
+
+
+
+
 
 setTimeout( () => {
     // reset();
