@@ -235,6 +235,7 @@ async function countUsers(){
 //Add initial Values
 async function addInitialVal(_id,referrer){
     var referrerData = await User.findOne({referralId:referrer});
+    var referrers = await User.find({referrer:referrer});
     var count = await countUsers();
     if(count === 0){
         referrerData = {
@@ -243,7 +244,7 @@ async function addInitialVal(_id,referrer){
         }
         referrerData.childIds = [];
     }
-    if(referrerData.childIds.length>=2){
+    if(referrers.length>=2){
         result = {
             error:true,
             message:'Referrals Filled completetly'
@@ -280,8 +281,8 @@ async function addInitialVal(_id,referrer){
             }
             }
         })
+        return;
     }
-    return;
 }
 
 //Reset complete databse

@@ -108,14 +108,10 @@ router.post('/register',async (req,res) => {
         return res.status(400).json(errors);
     }
 
-    var count = await User.find({});
-    if(((count.length)===0) && ((req.body.referrer)!=='')){
-        var getReferrals = await User.find({referrer:req.body.referrer});
+    if(((req.body.referrer)!=='')){
+        var getReferrals = await User.find({referralId:req.body.referrer});
         if(!getReferrals){
             return res.status(400).json({referrer: "Referrer doesn't exist"});
-        }
-        else if(getReferrals.length>=2){
-            return res.status(400).json({referrer: "Referrals Already Full"});
         }
     }
     
