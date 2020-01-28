@@ -64,7 +64,8 @@ const userSchema = new Schema({
         default: false
     },
     parentId: {
-        type: String
+        type: String,
+        default:null
     },
     childIds: [
         {
