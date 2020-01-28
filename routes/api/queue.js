@@ -214,9 +214,9 @@ async function StageUpgrades(ancestorId,_id){
     return;
 }
 
-// @route GET api/queue/approve
+// @route GET api/queue/approve/userId
 // @desc Approve user
-// @access Public
+// @access Admin
 router.get('/approve/:userid',async (request,response) => {
     var _id = request.params.userid;
     //get referrer details who is a parent of this user
@@ -235,7 +235,8 @@ async function countUsers(){
 //Add initial Values
 async function addInitialVal(_id,referrer){
     var referrerData = await User.findOne({referralId:referrer});
-    var referrers = await User.find({referrer:referrer});
+    var referrers = await User.find({referrer:referrer,action:true});
+    console.log(referrers)
     var count = await countUsers();
     if(count === 0){
         referrerData = {

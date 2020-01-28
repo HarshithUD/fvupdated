@@ -1,3 +1,89 @@
 Server running on Port 80
 Server is ready to take messages
 Database Connected Successfully
+[
+  {
+    address: {
+      streetaddress: 'T57IO',
+      city: '569I',
+      state: 'TR78I',
+      pincode: '36'
+    },
+    payout: {
+      requested: false,
+      eligible: 0,
+      date: 2020-01-28T13:23:52.451Z,
+      transactions: []
+    },
+    verified: false,
+    active: true,
+    parentId: '5e3035828e80ba0017c529ba',
+    stage: 1,
+    class: '1',
+    level: 'silver',
+    weight: 0,
+    wallet: 0,
+    action: true,
+    declined: false,
+    _id: 5e3035e88e80ba0017c529bb,
+    name: 'shanelle',
+    email: 'abc2@gmail.com',
+    password: '$2a$10$ukCmzPSpjKEzsenqG0hw4.mwyuaXUEKUuVlQ4C/4GMIC5evUZWbRW',
+    number: '7000000001',
+    referralId: 'SHZZ5Q',
+    referrer: 'AFCLOM',
+    childIds: [],
+    date: 2020-01-28T13:23:52.451Z,
+    transactions: [ [Object] ],
+    childUpgraded: [],
+    __v: 0,
+    accnumber: '645453543534',
+    bankname: 'T7I',
+    bankuser: '46Y8OUI',
+    ifsc: 'TU7IK58',
+    lastname: 'GFTUYJ',
+    pan: null
+  },
+  {
+    address: {
+      streetaddress: 'JEDGUYGYER',
+      city: 'CDCGEGVEG',
+      state: 'EYGFEY8GFYU',
+      pincode: '1234567'
+    },
+    payout: {
+      requested: false,
+      eligible: 0,
+      date: 2020-01-28T13:25:04.658Z,
+      transactions: []
+    },
+    verified: false,
+    active: true,
+    parentId: '5e3035828e80ba0017c529ba',
+    stage: 1,
+    class: '1',
+    level: 'silver',
+    weight: 0,
+    wallet: 0,
+    action: true,
+    declined: false,
+    _id: 5e3036308e80ba0017c529bc,
+    name: 'HJFDUFD',
+    email: 'abc1@gmail.com',
+    password: '$2a$10$WFBvjId.0dC8eEbPpiI39.IE1iV9f4yLQNX6NmoUbrRIgM.Rd5epq',
+    number: '7000000000',
+    referralId: 'HJWIN0',
+    referrer: 'AFCLOM',
+    childIds: [],
+    date: 2020-01-28T13:25:04.658Z,
+    transactions: [ [Object] ],
+    childUpgraded: [],
+    __v: 0,
+    accnumber: '123456782543674',
+    bankname: 'SYNDICATE BANK',
+    bankuser: 'YSFDUWFTDF',
+    ifsc: 'SYNB0001255',
+    lastname: 'HEYGFYEGFYI',
+    pan: null
+  }
+]
