@@ -236,7 +236,6 @@ async function countUsers(){
 async function addInitialVal(_id,referrer){
     var referrerData = await User.findOne({referralId:referrer});
     var referrers = await User.find({referrer:referrer,action:true});
-    console.log(referrers)
     var count = await countUsers();
     if(count === 0){
         referrerData = {
@@ -266,7 +265,7 @@ async function addInitialVal(_id,referrer){
             name:"Initial Deposit",
             type:"Deposit",
             amount:'+'+initialDeposit
-        }}},{useFindAndModify:false},(errors,result)=>{
+        }}},{useFindAndModify:false,new:true},(errors,result)=>{
             if(errors){
                 console.log(errors);
             }
@@ -300,7 +299,8 @@ async function reset(){
             wallet:0,
             childUpgraded:[],
             stage:1,
-            'payout.eligible':0
+            'payout.eligible':0,
+            parentId:null
         }
     },(err,res) => {
         if(err)console.log(err);

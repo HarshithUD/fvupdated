@@ -109,8 +109,8 @@ router.post('/register',async (req,res) => {
     }
 
     if(((req.body.referrer)!=='')){
-        var getReferrals = await User.find({referralId:req.body.referrer});
-        if(!getReferrals){
+        var getReferrals = await User.findOne({referralId:req.body.referrer});
+        if(getReferrals === null){
             return res.status(400).json({referrer: "Referrer doesn't exist"});
         }
     }
