@@ -65,6 +65,27 @@ async function getChildrens(_id){
     return childrens.childIds;
 }
 
+//Get next level
+async function findNextLevel(currentLevel){
+    let nextLevel = '';
+    if(currentLevel === 'silver'){
+        nextLevel = 'gold';
+        return nextLevel;
+    }
+    else if(currentLevel === 'gold'){
+        nextLevel = 'sapphire';
+        return nextLevel;
+    }
+    else if(currentLevel === 'sapphire'){
+        let error = {
+            error:true,
+            message:'Upgraded completetely'
+        }
+        return error;
+    }
+    return;
+}
+
 //Get all descendants of a user
 async function getAllDescendants(_id){
     //implementing Bread first algorithm for getting all descendants of particular user
@@ -108,7 +129,8 @@ async function processUpgrade(_id){
             console.log('***************');
             //Check if any User has six upgrades of same stage then upgrade it
             var stage = 2;
-            var ancestorUpgrade = await ancestorUpgrades(_id,stage);
+            let level = 'silver';
+            var ancestorUpgrade = await ancestorUpgrades(_id,stage,level);
         }
     }
     return;
@@ -142,13 +164,13 @@ async function upgradeStage(_id){
 }
 
 //Upgrade whenever there is any upgrades
-async function ancestorUpgrades(_id,stage){
+async function ancestorUpgrades(_id,stage,level){
     //storing upgrade information in every ancestor
     //get all ancestors and remember about upgrade to every ancestor of that user
     var userAncestors = await getAncestors(_id);
     userAncestors.forEach(async (ele,index) => {
         var ancDets = await getUserDetails(ele);
-        if(ancDets.stage === stage && ancDets.stage <= 5){
+        if(ancDets.stage === stage && ancDets.stage <= 5 && ancDets.level === level){
             if(ancDets.childUpgraded.length < 5){
                 var storeUpgrade = await User.findOneAndUpdate({_id:ancDets._id},{
                     $push: {
@@ -171,14 +193,60 @@ async function ancestorUpgrades(_id,stage){
                 },{useFindAndModify:false})
             }
         }
-        else if(stage > 5){
+        else if(ancDets.stage === stage && 10 > ancDets.stage &&  ancDets.stage > 5 && ancDets.level === level){
             // Do stage 5 + process for 5 referrals initially 
             // ----------------------------------------------
+            if(ancDets.childUpgraded.length < 5){
+                var storeUpgrade = await User.findOneAndUpdate({_id:ancDets._id},{
+                    $push: {
+                        childUpgraded:{
+                            userId:_id
+                        }
+                    }
+                },{useFindAndModify:false})
+            }
+            else if(ancDets.childUpgraded.length === 5){
+                //Upgrade Stage not eligible for payout
+                var stageUpgrade = await MidStageUpgrades(ancDets._id,_id);
+            }
+            else if(ancDets.childUpgraded.length === 6){
+                var storeUpgrade = await User.findOneAndUpdate({_id:ancDets._id},{
+                    $set: {
+                        childUpgraded:{
+                            userId:_id
+                        }
+                    }
+                },{useFindAndModify:false})
+            }
+        }
+        else if(ancDets.stage === stage && ancDets.stage === 10 && ancDets.level === level){
+            if(ancDets.childUpgraded.length < 5){
+                var storeUpgrade = await User.findOneAndUpdate({_id:ancDets._id},{
+                    $push: {
+                        childUpgraded:{
+                            userId:_id
+                        }
+                    }
+                },{useFindAndModify:false})
+            }
+            else if(ancDets.childUpgraded.length === 5){
+                //If a level's stage is completed
+                var stageUpgrade = await finalStageUpgrade(ancDets._id,_id,ancDets.level);
+            }
+            else if(ancDets.childUpgraded.length === 6){
+                var storeUpgrade = await User.findOneAndUpdate({_id:ancDets._id},{
+                    $set: {
+                        childUpgraded:{
+                            userId:_id
+                        }
+                    }
+                },{useFindAndModify:false})
+            }
         }
     })
 }
 
-//Stage upgrades
+//Stage upgrades if stage if 5 and less
 async function StageUpgrades(ancestorId,_id){
     var adminData = await getAdminResult();
     var doUpgrade = await User.findOneAndUpdate({_id:ancestorId},{
@@ -205,13 +273,88 @@ async function StageUpgrades(ancestorId,_id){
     },{useFindAndModify:false})
     // remember this upgrade and loop through stage upgrade process
     var didOps = await getUserDetails(ancestorId);
-    var doStageOps = await ancestorUpgrades(ancestorId,didOps.stage);
+    var doStageOps = await ancestorUpgrades(ancestorId,didOps.stage,didOps.level);
     console.log('******************************')
     console.log('Upgraded Users: ');
     console.log(doUpgrade);
     console.log(doStageOps)
     console.log('******************************')
     return;
+}
+
+//Stage upgrades if Stage is between 5 & 10
+async function MidStageUpgrades(ancestorId,_id){
+    var adminData = await getAdminResult();
+    var doUpgrade = await User.findOneAndUpdate({_id:ancestorId},{
+        $push:{
+            childUpgraded:{
+                userId:_id
+            },
+            transactions:[{          
+                name:"Referral",
+                type:"Deposit",
+                amount:'+'+3*adminData.lvl1depfin
+            },
+            {          
+                name:"Deposit",
+                type:"Deposit",
+                amount:'-'+adminData.lvl1depfin
+            }]
+        },
+        $inc:{
+            stage:1,
+            wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
+        }
+    },{useFindAndModify:false})
+    // remember this upgrade and loop through stage upgrade process
+    var didOps = await getUserDetails(ancestorId);
+    var doStageOps = await ancestorUpgrades(ancestorId,didOps.stage,didOps.level);
+    console.log('******************************')
+    console.log('Upgraded Users: ');
+    console.log(doUpgrade);
+    console.log(doStageOps)
+    console.log('******************************')
+    return;
+}
+
+//Stage upgrades if Stage is 10 or When a level is completed
+async function finalStageUpgrade(ancestorId,_id,level){
+    var nextLevel = await findNextLevel(level);
+    if(typeof nextLevel.error !== 'undefined'){
+        let error = {
+            error:true,
+            message:'Upgrade fully completed'
+        }
+    }
+    else{
+        var getUserinfo = await getUserDetails(ancestorId);
+    var doUpgrade = await User.findOneAndUpdate({_id:ancestorId},{
+        $push:{
+            childUpgraded:{
+                userId:_id
+            },
+            transactions:[{          
+                name:"Deposit",
+                type:"Deposit",
+                amount:'-'+(getUserDetails.wallet - getUserDetails.payout.eligible)
+            }]
+        },
+        $set:{
+            stage:1,
+            wallet:getUserDetails.payout.eligible,
+            level:nextLevel
+        }
+    },{useFindAndModify:false})
+    // remember this upgrade and loop through stage upgrade process
+    var didOps = await getUserDetails(ancestorId);
+    var doStageOps = await ancestorUpgrades(ancestorId,didOps.stage,didOps.level);
+    console.log('******************************')
+    console.log('Upgraded Users: ');
+    console.log(doUpgrade);
+    console.log(doStageOps)
+    console.log('******************************')
+    return;
+    }
 }
 
 // @route GET api/queue/approve/userId
