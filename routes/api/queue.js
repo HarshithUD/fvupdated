@@ -33,6 +33,13 @@ async function getUserDetails(_id){
     return userdetails;
 }
 
+//Get User Parent by referrer ID
+async function getReferrerId(referrerId){
+    var getUser = await User.findOne({_id:referrerId});
+    var parentId = await User.findOne({referralId:getUser.referrer})
+    return parentId;
+}
+
 //Filter Unique values in array or stack
 //only unique elems
 function onlyUnique(value, index, self) { 
@@ -47,8 +54,9 @@ class Stack{
 
 //Get Ancestor of a user
 async function getAncestors(_id){
-    var getUser = await getUserDetails(_id);
-    let parentId = getUser.parentId;
+    console.log("ID: "+_id)
+    let parentId = await getReferrerId(_id);
+    console.log(parentId)
     let Ancestors = new Stack;
     while(parentId !== null){
         Ancestors.items.push(parentId);
@@ -110,6 +118,7 @@ async function getAllDescendants(_id){
 async function QueueOperation(_id){
     //get all ancestors
     var ancestorsOfUser = await getAncestors(_id);
+    console.log(ancestorsOfUser)
     ancestorsOfUser.forEach( async (ele,index) => {
         // do upgrade process if necessary
         var doInitialUpgrade = await processUpgrade(ele);
@@ -121,6 +130,7 @@ async function processUpgrade(_id){
     var userDets = await getUserDetails(_id);
     if(userDets.stage === 1){
         var userDescendants = await getAllDescendants(_id);
+        console.log('here')
         if(userDescendants.length === 5){
             //Carry out initial upgrade
             var userupgrade = await upgradeStage(_id);
