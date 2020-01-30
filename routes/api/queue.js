@@ -41,7 +41,12 @@ async function getReferrerId(referrerId){
     else {
         var getUser = await User.findOne({_id:referrerId});
         var parentId = await User.findOne({referralId:getUser.referrer})
-        return parentId;
+        if(parentId !== null){
+            return parentId._id;
+        }
+        else{
+            return null;
+        }
     }
 }
 
@@ -59,9 +64,7 @@ class Stack{
 
 //Get Ancestor of a user
 async function getAncestors(_id){
-    console.log("ID: "+_id)
     let parentId = await getReferrerId(_id);
-    console.log(parentId)
     let Ancestors = new Stack;
     while(parentId !== null){
         Ancestors.items.push(parentId);
@@ -349,12 +352,12 @@ async function finalStageUpgrade(ancestorId,_id,level){
             transactions:[{          
                 name:"Deposit",
                 type:"Deposit",
-                amount:'-'+(getUserDetails.wallet - getUserDetails.payout.eligible)
+                amount:'-'+(getUserinfo.wallet - getUserinfo.payout.eligible)
             }]
         },
         $set:{
             stage:1,
-            wallet:getUserDetails.payout.eligible,
+            wallet:getUserinfo.payout.eligible,
             level:nextLevel
         }
     },{useFindAndModify:false})
