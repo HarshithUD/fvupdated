@@ -4,17 +4,19 @@ const Schema = mongoose.Schema
 //Create Queue
 const QueueSchema = new Schema(
     {
-    queueList: [
-        {
-            userId:{
-                type: String
-            },
-            date:{
-                type: Date,
-                default: Date.now
-            }
+        userId:{
+            type: String
+        },
+        stage:{
+            type: Number
+        },
+        level:{
+            type: String
+        },
+        date:{
+            type: Date,
+            default: Date.now
         }
-    ]
 }
 )
 

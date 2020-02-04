@@ -34,12 +34,26 @@ router.get('/approve/:userid',async (request,response) => {
     //get userid
     let _id = request.params.userid;
     //get referrer details who is a parent of this user
-    var doQueueOperations = await QueueOperation(_id);
-    var useris = await getUserDetails(_id)
-    var initialProcess = await addInitialVal(_id,useris.referrer);
-    response.send(initialProcess);
+    var referrer = await getReferrer(_id);
+    // Get user tree structure
+    var getTree = await getUserTree(_id,referrer);
+    // Do initial Process
+    var referreris = await getUserDetails(_id);
+    var doInitial = await addInitialVal(_id,referreris.referrer);
+    response.send(doInitial);
 });
 
+//Get Parent
+async function getReferrer(_id){
+    var userInfo = await getUserDetails(_id);
+    if(userInfo.referrer !== null){
+        var getReferrer = await User.findOne({referralId:userInfo.referrer});
+        return getReferrer;
+    }
+    else{
+        return null;
+    }
+}
 
 //count approved users
 async function countUsers(){
@@ -53,46 +67,117 @@ async function getUserDetails(_id){
     return userDets;
 }
 
-//Queue Operations
-async function QueueOperation(_id){
-    //get first direct parent if any
-    var getParent = await getReferrer(_id);
-    if(getParent !== null && getParent.parentId !== null){
-        var checkForUpgrade = upgrade(getParent.parentId);
-        return checkForUpgrade
+// Get Parent
+async function getParent(_id){
+    if(_id !== null || typeof _id !== 'undefined'){
+        var parent = await User.findOne({_id});
+        if(parent !== null){
+            if(parent.parentId !== null){
+                return parent.parentId;
+            }
+        }
+        else{
+            return null;
+        }
+    }
+    else return null;
+}
+
+// Get His Parent
+async function getUserTree(_id,hisParent){
+    // get's Parent Parent
+    if(hisParent !== null){
+        var parentId = await getParent(hisParent._id);
+        if(parentId !== null){
+            var userTree = await getDescandants(parentId);
+            return;
+        }
+    }
+    return;
+}
+
+class Stack{
+    constructor(){
+        this.items = [];
     }
 }
 
-async function upgrade(_id){
-    //Get all descendants
-    var parentInfo = await getUserDetails(_id);
-    if(parentInfo.childIds.length === 2 && parentInfo.stage === 1){
-        var childrenLength1 = await getChildrenLen(parentInfo.childIds[0].userId);
-        var childrenLength2 = await getChildrenLen(parentInfo.childIds[1].userId);
-        console.log((childrenLength1 + childrenLength2));
-        if((childrenLength1 + childrenLength2) === 3){
-            var stageUpgrade = await upgradeStage(_id);
-            return stageUpgrade;
+// Get children
+async function getChildren(_id){
+    var getUserInfo = await getUserDetails(_id);
+    var userChild = getUserInfo.childIds;
+    return userChild;
+}
+
+// Check for Stage
+async function checkForStage(tree){
+    for(i=0;i<tree.items.length;i++){
+        console.log(tree.items[0])
+    }
+}
+
+// Get Descendants
+async function getDescandants(_id){
+    let tree = new Stack();
+    var userInfo = await getUserDetails(_id);
+    if(userInfo !== null){
+    if(userInfo.stage === 1){
+        var directChild = userInfo.childIds;
+        tree.items.push(userInfo.childIds[0].userId);
+        tree.items.push(userInfo.childIds[1].userId);
+        if(directChild.length === 2){
+            // Get First child's child
+            var getFirstChild = await getChildren(userInfo.childIds[0].userId);
+            // Get Second Child's child
+            var getSecondChild = await getChildren(userInfo.childIds[1].userId);
+            // Get count
+            var countChild = getFirstChild.length + getSecondChild.length;
+            console.log(getFirstChild.length)
+            if(countChild === 3){
+                tree.items.push(getFirstChild[0].userId);
+                tree.items.push(getSecondChild[0].userId);
+                tree.items.push(getFirstChild[1].userId);
+                // var checkForInitialStage = checkForStage(tree);
+                await upgradeStage(_id);
+            }
+            else{
+                return;
+            }
+        }
+        else{
+            return;
         }
     }
 }
-
-//Get children len
-async function getChildrenLen(_id){
-    var childs = await getUserDetails(_id);
-    return childs.childIds.length;
+    return;
 }
 
-//Get Parent
-async function getReferrer(_id){
-    var userInfo = await getUserDetails(_id);
-    if(userInfo.referrer !== null){
-        var getReferrer = await User.findOne({referralId:userInfo.referrer});
-        return getReferrer;
-    }
-    else{
-        return null;
-    }
+//initial Stage upgrade
+async function upgradeStage(_id){
+    var adminData = await getAdminResult();
+    var stageUpgrade = await User.findOneAndUpdate({_id},{
+        $set:{
+            stage:2
+        },
+        $push:{
+            transactions:[{          
+                name:"Referral",
+                type:"Deposit",
+                amount:'+'+3*adminData.lvl1depfin
+            },
+            {          
+                name:"Deposit",
+                type:"Deposit",
+                amount:'-'+adminData.lvl1depfin
+            }]
+        },
+        $inc:{
+            wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin),
+            "payout.eligible":(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
+        }
+    },{useFindAndModify:false})
+    var stageUpgrade = await stageUpgradation(_id);
+    return stageUpgrade;
 }
 
 //Add initial Values
@@ -148,31 +233,74 @@ async function addInitialVal(_id,referrer){
     }
 }
 
-//initial Stage upgrade
-async function upgradeStage(_id){
-    var adminData = await getAdminResult();
-    var stageUpgrade = await User.findOneAndUpdate({_id},{
-        $set:{
-            stage:2
-        },
-        $push:{
-            transactions:[{          
-                name:"Referral",
-                type:"Deposit",
-                amount:'+'+3*adminData.lvl1depfin
-            },
-            {          
-                name:"Deposit",
-                type:"Deposit",
-                amount:'-'+adminData.lvl1depfin
-            }]
-        },
-        $inc:{
-            wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin),
-            "payout.eligible":(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
+// Stage 2 + Upgrade 
+async function stageUpgradation(_id){
+    // Upgrade Stage
+    var getUser = await getUserDetails(_id);
+    var userStage = getUser.stage;
+    var userLevel = getUser.level;
+    var exi = await Queue.find({});
+    if(exi.length === 0){
+        newQueue = new Queue({
+            userId:_id,
+            stage:userStage,
+            level:userLevel
+        })
+        newQueue.save();
+    }
+    else{
+        // Checking for weight 6
+        var getQueueList = await Queue.find({stage:userStage,level:userLevel});
+        if(getQueueList.length < 6){
+            // newQueue = new Queue({
+            //     userId:_id,
+            //     stage:userStage,
+            //     level:userLevel
+            // })
+            // newQueue.save();
+            var x = await Queue.insertMany(
+                {
+                    userId:_id,
+                    stage:userStage,
+                    level:userLevel
+                }
+            );
+            console.log(x)
         }
-    },{useFindAndModify:false})
-    return stageUpgrade;
+        if(getQueueList.length === 6){
+            // Upgrade Stage of the First User
+            var upgradingUser = getQueueList.shift();
+            var upgrading = await upgradeUser(upgradingUser);
+            return;
+        }
+    }
+    return;
+
+}
+
+// Upgrade User
+async function upgradeUser(user){
+    var getUserInfo = await getUserDetails(user.userId);
+    if(getUserInfo.stage < 10){
+        var upgrade = await User.findOneAndUpdate({_id:user.userId},{
+            $inc:{stage:1}
+        },{useFindAndModify:false});
+        // Move to next stage queue
+        var upgradeInQueue = await Queue.findOneAndUpdate({userId:user.userId},{
+            $inc:{stage:1}
+        },{useFindAndModify:false})
+        return;
+    }
+    else if(getUserInfo.stage === 10){
+        var upgrade = await User.findOneAndUpdate({_id:user.userId},{
+            $set:{stage:1,level:'gold'}
+        },{useFindAndModify:false});
+        // Move to next stage queue
+        var upgradeInQueue = await Queue.findOneAndUpdate({userId:user.userId},{
+            $set:{stage:1,level:'gold'}
+        },{useFindAndModify:false})
+        return;
+    }
 }
 
 //Reset complete databse
