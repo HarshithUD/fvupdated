@@ -127,6 +127,24 @@ class adminsidebar extends Component {
                     </Link>
                   </li>
                   <li>
+                    <Link to="/admin/silver-users">
+                    <i className="fa fa-rupee-sign"></i>
+                      <span>Silver Users</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/gold-users">
+                    <i className="fa fa-rupee-sign"></i>
+                      <span>Gold Users</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/sapphire-users">
+                    <i className="fa fa-rupee-sign"></i>
+                      <span>Sapphire Users</span>
+                    </Link>
+                  </li>
+                  <li>
                     <Link to="/admin/payout-eligible">
                         <i className="fa fa-question-circle"></i>
                         <span>Eligible for Payout</span>

@@ -4,9 +4,18 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser } from "../../../../actions/authActions";
 import $ from 'jquery'
+import Axios from 'axios';
 
 class sidebar extends Component {
-    componentDidMount(){
+  constructor(props){
+    super(props);
+    this.state = {
+      userLevel:''
+    }
+  }
+
+    async componentDidMount(){
+      await this.getName(this.props.user.id);
         $(".sidebar-dropdown > a").click(function(e) {
             e.preventDefault();
             $(".sidebar-submenu").slideUp(200);
@@ -53,6 +62,17 @@ class sidebar extends Component {
       e.preventDefault();
       this.props.logoutUser();
     };
+
+    getName = (id) => {
+      Axios.get('/api/users/getDetails/'+id).then(
+        res => {
+          console.log(res.data);
+          this.setState({
+            userLevel:res.data.level
+          })
+        }
+      )
+    }
     
     render() {
         return (
@@ -77,7 +97,7 @@ class sidebar extends Component {
                   <span className="user-name">
                     <strong>{this.props.user.name}</strong>
                   </span>
-                  {/* <span className="user-role">Administrator</span> */}
+                  <span className="badge badge-secondary user-role" style={{fontSize:'13px',fontWeight:'400'}}>{this.state.userLevel}</span>
                   <span className="user-status">
                     <i className="fa fa-circle"></i>
                     <span>Online</span>

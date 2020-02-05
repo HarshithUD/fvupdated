@@ -116,8 +116,6 @@ async function getDescandants(_id){
     if(userInfo !== null){
     if(userInfo.stage === 1){
         var directChild = userInfo.childIds;
-        tree.items.push(userInfo.childIds[0].userId);
-        tree.items.push(userInfo.childIds[1].userId);
         if(directChild.length === 2){
             // Get First child's child
             var getFirstChild = await getChildren(userInfo.childIds[0].userId);
@@ -126,9 +124,6 @@ async function getDescandants(_id){
             // Get count
             var countChild = getFirstChild.length + getSecondChild.length;
             if(countChild === 3){
-                tree.items.push(getFirstChild[0].userId);
-                tree.items.push(getSecondChild[0].userId);
-                tree.items.push(getFirstChild[1].userId);
                 // var checkForInitialStage = checkForStage(tree);
                 await upgradeStage(_id);
             }
@@ -150,8 +145,6 @@ async function getDescandantsStage2P(_id){
     var userInfo = await getUserDetails(_id);
     if(userInfo !== null){
         var directChild = userInfo.childIds;
-        tree.items.push(userInfo.childIds[0].userId);
-        tree.items.push(userInfo.childIds[1].userId);
         if(directChild.length === 2){
             // Get First child's child
             var getFirstChild = await getChildren(userInfo.childIds[0].userId);
@@ -160,10 +153,6 @@ async function getDescandantsStage2P(_id){
             // Get count
             var countChild = getFirstChild.length + getSecondChild.length;
             if(countChild === 4){
-                tree.items.push(getFirstChild[0].userId);
-                tree.items.push(getSecondChild[0].userId);
-                tree.items.push(getSecondChild[1].userId);
-                tree.items.push(getFirstChild[1].userId);
                 // var checkForInitialStage = checkForStage(tree);
                 await upgradeStage2P(_id);
             }
@@ -210,7 +199,13 @@ async function upgradeStage(_id){
 //initial Stage upgrade
 async function upgradeStage2P(_id){
     var adminData = await getAdminResult();
+    var getUserinfos = await getUserDetails(_id);
+    var nextLevel = 'gold';
+    if(getUserInfos.stage <= 5){
     var stageUpgrade = await User.findOneAndUpdate({_id},{
+        $set:{
+            childIds:[]
+        },
         $push:{
             transactions:[{          
                 name:"Referral",
@@ -229,6 +224,54 @@ async function upgradeStage2P(_id){
             "payout.eligible":(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
         }
     },{useFindAndModify:false})
+    }
+    else if(getUserInfos.stage > 5 && getUserinfos.stage < 10){
+        var stageUpgrade = await User.findOneAndUpdate({_id},{
+            $set:{
+                childIds:[]
+            },
+            $push:{
+                transactions:[{          
+                    name:"Referral",
+                    type:"Deposit",
+                    amount:'+'+3*adminData.lvl1depfin
+                },
+                {          
+                    name:"Deposit",
+                    type:"Deposit",
+                    amount:'-'+adminData.lvl1depfin
+                }]
+            },
+            $inc:{
+                stage:1,
+                wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
+            }
+        },{useFindAndModify:false})
+    }
+    else if(getUserInfos.stage === 10){
+        var stageUpgrade = await User.findOneAndUpdate({_id},{
+            $set:{
+                childIds:[],
+                stage:1,
+                level:nextLevel
+            },
+            $push:{
+                transactions:[{          
+                    name:"Referral",
+                    type:"Deposit",
+                    amount:'+'+3*adminData.lvl1depfin
+                },
+                {          
+                    name:"Deposit",
+                    type:"Deposit",
+                    amount:'-'+adminData.lvl1depfin
+                }]
+            },
+            $inc:{
+                wallet:0
+            }
+        },{useFindAndModify:false})
+    }
     var stageUpgrade = await stageUpgradation(_id);
     return stageUpgrade;
 }
