@@ -446,7 +446,7 @@ async function addInitialVal(_id,referrer){
 
 //Reset complete databse
 setTimeout( async () => {
-    // reset();
+    reset();
 },3000)
 
 async function reset(){

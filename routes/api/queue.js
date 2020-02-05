@@ -109,13 +109,6 @@ async function getChildren(_id){
     return userChild;
 }
 
-// Check for Stage
-async function checkForStage(tree){
-    for(i=0;i<tree.items.length;i++){
-        console.log(tree.items[0])
-    }
-}
-
 // Get Descendants
 async function getDescandants(_id){
     let tree = new Stack();
@@ -132,7 +125,6 @@ async function getDescandants(_id){
             var getSecondChild = await getChildren(userInfo.childIds[1].userId);
             // Get count
             var countChild = getFirstChild.length + getSecondChild.length;
-            console.log(getFirstChild.length)
             if(countChild === 3){
                 tree.items.push(getFirstChild[0].userId);
                 tree.items.push(getSecondChild[0].userId);
@@ -152,12 +144,47 @@ async function getDescandants(_id){
     return;
 }
 
+// Get Descendants
+async function getDescandantsStage2P(_id){
+    let tree = new Stack();
+    var userInfo = await getUserDetails(_id);
+    if(userInfo !== null){
+        var directChild = userInfo.childIds;
+        tree.items.push(userInfo.childIds[0].userId);
+        tree.items.push(userInfo.childIds[1].userId);
+        if(directChild.length === 2){
+            // Get First child's child
+            var getFirstChild = await getChildren(userInfo.childIds[0].userId);
+            // Get Second Child's child
+            var getSecondChild = await getChildren(userInfo.childIds[1].userId);
+            // Get count
+            var countChild = getFirstChild.length + getSecondChild.length;
+            if(countChild === 4){
+                tree.items.push(getFirstChild[0].userId);
+                tree.items.push(getSecondChild[0].userId);
+                tree.items.push(getSecondChild[1].userId);
+                tree.items.push(getFirstChild[1].userId);
+                // var checkForInitialStage = checkForStage(tree);
+                await upgradeStage2P(_id);
+            }
+            else{
+                return;
+            }
+        }
+        else{
+            return;
+        }
+}
+    return;
+}
+
 //initial Stage upgrade
 async function upgradeStage(_id){
     var adminData = await getAdminResult();
     var stageUpgrade = await User.findOneAndUpdate({_id},{
         $set:{
-            stage:2
+            stage:2,
+            childIds:[]
         },
         $push:{
             transactions:[{          
@@ -172,6 +199,32 @@ async function upgradeStage(_id){
             }]
         },
         $inc:{
+            wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin),
+            "payout.eligible":(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
+        }
+    },{useFindAndModify:false})
+    var stageUpgrade = await stageUpgradation(_id);
+    return stageUpgrade;
+}
+
+//initial Stage upgrade
+async function upgradeStage2P(_id){
+    var adminData = await getAdminResult();
+    var stageUpgrade = await User.findOneAndUpdate({_id},{
+        $push:{
+            transactions:[{          
+                name:"Referral",
+                type:"Deposit",
+                amount:'+'+3*adminData.lvl1depfin
+            },
+            {          
+                name:"Deposit",
+                type:"Deposit",
+                amount:'-'+adminData.lvl1depfin
+            }]
+        },
+        $inc:{
+            stage:1,
             wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin),
             "payout.eligible":(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
         }
@@ -233,49 +286,59 @@ async function addInitialVal(_id,referrer){
     }
 }
 
+// check for parent upgrade
+async function checkForStageUpgrade(_id){
+    // Get Parent
+    var getHisParent = await getParent(_id);
+    if(getHisParent !== null){
+            var upg = await getDescandantsStage2P(getHisParent);
+            return;
+    }
+    else{
+        return;
+    }
+    return;
+}
+
 // Stage 2 + Upgrade 
 async function stageUpgradation(_id){
     // Upgrade Stage
     var getUser = await getUserDetails(_id);
     var userStage = getUser.stage;
     var userLevel = getUser.level;
-    var exi = await Queue.find({});
-    if(exi.length === 0){
-        newQueue = new Queue({
-            userId:_id,
-            stage:userStage,
-            level:userLevel
+    // check if there is any same Staged user in new stage
+    var IfQueueExists = await User.find({stage:userStage});
+    if(IfQueueExists.length === 1){
+        // If first time it enters new Queue
+        var reset = await User.findOneAndUpdate({_id},{
+            $set:{
+                childIds:[]
+            }
         })
-        newQueue.save();
     }
     else{
-        // Checking for weight 6
-        var getQueueList = await Queue.find({stage:userStage,level:userLevel});
-        if(getQueueList.length < 6){
-            // newQueue = new Queue({
-            //     userId:_id,
-            //     stage:userStage,
-            //     level:userLevel
-            // })
-            // newQueue.save();
-            var x = await Queue.insertMany(
-                {
-                    userId:_id,
-                    stage:userStage,
-                    level:userLevel
-                }
-            );
-            console.log(x)
+        var resStack = new Stack();
+        IfQueueExists.forEach( async (elem,index) => {
+            if(elem.childIds.length >= 0 && elem.childIds.length < 2 && !elem._id.equals(_id)){
+                if(resStack.items.length === 0){
+                resStack.items.push(elem._id);
+            }
+            }
+        })
+        if(resStack.items.length === 1){
+                var updateChildodUser = await User.findOneAndUpdate({_id:resStack.items[0]},{
+                    $push:{
+                        childIds:{userId:_id}
+                    }
+                });
+                var updatePar = await User.findOneAndUpdate({_id},{
+                    $set:{parentId:resStack.items[0]}
+                })
+                await checkForStageUpgrade(resStack.items[0]);
         }
-        if(getQueueList.length === 6){
-            // Upgrade Stage of the First User
-            var upgradingUser = getQueueList.shift();
-            var upgrading = await upgradeUser(upgradingUser);
-            return;
-        }
+        
     }
     return;
-
 }
 
 // Upgrade User
