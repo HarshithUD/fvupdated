@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { logoutUser } from "../../../../actions/authActions";
-import $ from 'jquery'
+import $ from 'jquery';
 import Axios from 'axios';
 
 class sidebar extends Component {
@@ -11,7 +11,8 @@ class sidebar extends Component {
     super(props);
     this.state = {
       userLevel:'',
-      imagePath:''
+      imagePath:'',
+      action:false
     }
   }
 
@@ -71,6 +72,10 @@ class sidebar extends Component {
           this.setState({
             userLevel:res.data.level
           })
+          if(res.data.action){
+            this.setState({
+              action:true
+            })
           if(this.state.userLevel === 'silver'){
             this.setState({
               imagePath:require('../../images/003-medal-1.png')
@@ -97,6 +102,7 @@ class sidebar extends Component {
             })
           }
         }
+        }
       )
     }
     
@@ -121,9 +127,9 @@ class sidebar extends Component {
                 </div>
                 <div className="user-info">
                   <span className="user-name">
-                    <strong>{this.props.user.name} - <img src={this.state.imagePath} alt={this.state.userLevel} style={{width:'20px',margin:'5px'}}/></strong>
+                    <strong>{this.props.user.name} <img src={this.state.imagePath} alt={this.state.action && this.state.userLevel} style={{width:'20px',margin:'5px'}}/></strong>
                   </span>
-                  <span className="badge badge-secondary user-role" style={{fontSize:'13px',fontWeight:'400'}}>{this.state.userLevel}</span>
+                  {this.state.action && <span className="badge badge-secondary user-role" style={{fontSize:'13px',fontWeight:'400'}}>{this.state.userLevel}</span>}
                   <span className="user-status">
                     <i className="fa fa-circle"></i>
                     <span>Online</span>

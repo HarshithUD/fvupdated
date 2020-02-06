@@ -114,6 +114,11 @@ router.post('/register',async (req,res) => {
             return res.status(400).json({referrer: "Referrer doesn't exist"});
         }
     }
+
+    var referrers1 = await User.find({referrer:req.body.referrer});
+    if(referrers1.length > 1){
+        return res.status(400).json({referrer:"Referrer Has been filled completely"})
+    }
     
     User.findOne(
         {$or: [

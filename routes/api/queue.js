@@ -182,16 +182,11 @@ async function upgradeStage(_id){
             childIds:[]
         },
         $push:{
-            transactions:[{          
-                name:"Referral",
-                type:"Deposit",
-                amount:'+'+3*adminData.lvl1depfin
-            },
-            {          
+            transactions:{          
                 name:"Deposit",
                 type:"Deposit",
                 amount:'-'+adminData.lvl1depfin
-            }]
+            }
         },
         $inc:{
             wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin),
@@ -246,22 +241,17 @@ async function upgradeStage2P(_id){
     var nextLevel = await getNextLevel(getUserInfos.level);
     var adminData = await getAdminResult();
     var getAmount = await adminAmount(adminData,getUserInfos.level)
-    if(getUserInfos.stage <= 5){
+    if(getUserInfos.stage <= 2){
     var stageUpgrade = await User.findOneAndUpdate({_id},{
         $set:{
             childIds:[]
         },
         $push:{
-            transactions:[{          
-                name:"Referral",
-                type:"Deposit",
-                amount:'+'+3*getAmount
-            },
-            {          
+            transactions:{          
                 name:"Deposit",
                 type:"Deposit",
                 amount:'-'+getAmount
-            }]
+            }
         },
         $inc:{
             stage:1,
@@ -270,22 +260,17 @@ async function upgradeStage2P(_id){
         }
     },{useFindAndModify:false})
     }
-    else if(getUserInfos.stage > 5 && getUserinfos.stage < 10){
+    else if(getUserInfos.stage > 2 && getUserinfos.stage < 4){
         var stageUpgrade = await User.findOneAndUpdate({_id},{
             $set:{
                 childIds:[]
             },
             $push:{
-                transactions:[{          
-                    name:"Referral",
-                    type:"Deposit",
-                    amount:'+'+3*getAmount
-                },
-                {          
+                transactions:{          
                     name:"Deposit",
                     type:"Deposit",
                     amount:'-'+getAmount
-                }]
+                }
             },
             $inc:{
                 stage:1,
@@ -293,7 +278,7 @@ async function upgradeStage2P(_id){
             }
         },{useFindAndModify:false})
     }
-    else if(getUserInfos.stage === 10 && getUserInfos.level !== 'diamond'){
+    else if(getUserInfos.stage === 4 && getUserInfos.level !== 'diamond'){
         var stageUpgrade = await User.findOneAndUpdate({_id},{
             $set:{
                 childIds:[],
@@ -359,8 +344,17 @@ async function addInitialVal(_id,referrer){
                 User.findByIdAndUpdate({_id:result.parentId},{$push:{
                     childIds:{
                         userId:result._id
+                    },
+                    transactions:{          
+                        name:"Referral",
+                        type:"Credit",
+                        amount:'-'+(0.5*adminData.lvl1depfin)
                     }
-                }},{useFindAndModify:false},async (err,res)=>{
+                },
+                $inc:{
+                    wallet:0.5*(adminData.lvl1depfin)
+                }
+            },{useFindAndModify:false},async (err,res)=>{
                     if(err){console.log(err)}
                 })
             }
@@ -382,6 +376,28 @@ async function checkForStageUpgrade(_id){
         return;
     }
     return;
+}
+
+// admin amount for level 2+
+async function adminAmountStage2P(_id){
+    var user = await getUserDetails(_id);
+    var adminData = await getAdminResult();
+    let level = user.level;
+    if(level === 'silver'){
+        return adminData.lvl1depfin;
+    }
+    else if(level === 'gold'){
+        return adminData.lvl2depfin;
+    }
+    else if(level === 'emarald'){
+        return adminData.lvl3depfin;
+    }
+    else if(level === 'ruby'){
+        return adminData.lvl4depfin;
+    }
+    else if(level === 'diamond'){
+        return adminData.lvl5depfin;
+    }
 }
 
 // Stage 2 + Upgrade 
@@ -410,9 +426,18 @@ async function stageUpgradation(_id){
             }
         })
         if(resStack.items.length === 1){
+            var getAdminAmount = await adminAmountStage2P(resStack.items[0]);
                 var updateChildodUser = await User.findOneAndUpdate({_id:resStack.items[0]},{
                     $push:{
-                        childIds:{userId:_id}
+                        childIds:{userId:_id},
+                        transactions:{
+                            name:"Referral",
+                            type:"Credit",
+                            amount:'-'+(0.5*getAdminAmount)
+                        }
+                    },
+                    $inc:{
+                        wallet:0.5*getAdminAmount
                     }
                 });
                 var updatePar = await User.findOneAndUpdate({_id},{
