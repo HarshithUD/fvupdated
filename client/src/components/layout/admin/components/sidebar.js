@@ -139,9 +139,21 @@ class adminsidebar extends Component {
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin/sapphire-users">
+                    <Link to="/admin/emarald-users">
                     <i className="fa fa-rupee-sign"></i>
-                      <span>Sapphire Users</span>
+                      <span>Emarald Users</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/ruby-users">
+                    <i className="fa fa-rupee-sign"></i>
+                      <span>Ruby Users</span>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/diamond-users">
+                    <i className="fa fa-rupee-sign"></i>
+                      <span>Diamond Users</span>
                     </Link>
                   </li>
                   <li>

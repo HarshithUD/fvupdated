@@ -253,13 +253,13 @@ render() {
         var count = 0;
         arr1.map((data1,index) => {
           var dateAt = new Date(data1.date);
-            if(!data1.all.declined && data1.action && (dateAt >= this.state.startDate) && (dateAt <= this.state.toDate) && data1.all.level !== 'silver' && data1.all.level !== 'gold' ){
+            if(!data1.all.declined && data1.action && (dateAt >= this.state.startDate) && (dateAt <= this.state.toDate) && data1.all.level !== 'silver' && data1.all.level !== 'gold' && data1.all.level !== 'emarald' && data1.all.level !== 'ruby' ){
             return resultData[index] = {
                 slno:++count,
                 name:data1.name,
                 email:data1.email,
-                stage:data1.all.level==='sapphire'?data1.all.stage:data1.all.stage,
-                level:<span class="badge badge-secondary" style={{fontSize:'13px',fontWeight:'400'}}>{data1.all.level==='sapphire'?data1.all.level:'sapphire'}</span>,
+                stage:data1.all.level==='diamond'?data1.all.stage:data1.all.stage,
+                level:<span class="badge badge-secondary" style={{fontSize:'13px',fontWeight:'400'}}>{data1.all.level==='diamond'?data1.all.level:'diamond'}</span>,
                 date:data1.date,
                 action:<div><button type="button" className="btn btn-primary" onClick={() => this.viewDetails(data1.all)}>View Details</button>
                 </div>
@@ -275,12 +275,12 @@ render() {
     let data2arr = this.state.userDetail;
     data2arr.map((dataCsv,index) => {
       var dateAt2 = new Date(dataCsv.date);
-      if(!dataCsv.all.declined && dataCsv.all.action && dataCsv.all.active && (dateAt2 >= this.state.startDate) && (dateAt2 <= this.state.toDate) && dataCsv.all.level !== 'silver' && dataCsv.all.level !== 'gold' ){
+      if(!dataCsv.all.declined && dataCsv.all.action && dataCsv.all.active && (dateAt2 >= this.state.startDate) && (dateAt2 <= this.state.toDate) && dataCsv.all.level !== 'silver' && dataCsv.all.level !== 'gold' && dataCsv.all.level !== 'emarald' && dataCsv.all.level !== 'ruby' ){
       let rsname = dataCsv.all.name;
       let rsid = dataCsv.all._id;
       let rsdate = dataCsv.all.date;
-      let rsstage = dataCsv.all.level==='sapphire'?dataCsv.all.stage:dataCsv.all.stage;
-      let rslevel = dataCsv.all.level==='sapphire'?dataCsv.all.level:'sapphire';
+      let rsstage = dataCsv.all.level==='diamond'?dataCsv.all.stage:dataCsv.all.stage;
+      let rslevel = dataCsv.all.level==='diamond'?dataCsv.all.level:'diamond';
       let rswallet = dataCsv.all.wallet;
       let rspayEli = dataCsv.all.payout && dataCsv.all.payout.eligible;
       let rsemail = dataCsv.all.email;

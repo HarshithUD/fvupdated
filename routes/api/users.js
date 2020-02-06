@@ -581,7 +581,6 @@ function getUserData(userid){
     let child1 = [];
     return new Promise((resolve,reject) => {
         User.find({_id:userid},async (err,response) => {
-            if((response[0].stage === 1)){
                 userdata = {
                     name:response[0].name,
                     id:response[0]._id,
@@ -589,16 +588,6 @@ function getUserData(userid){
                     child2: (response[0].childIds[1] && await getData(response[0].childIds[1]))
                 }
                 resolve(userdata)
-            }
-            else{
-                userdata = {
-                    name:response[0].name,
-                    id:response[0]._id,
-                    child1: (response[0].childUpgraded[0] && await getData2(response[0].childUpgraded[0],response[0].childUpgraded[2],response[0].childUpgraded[3])),
-                    child2: (response[0].childUpgraded[1] && await getData2(response[0].childUpgraded[1],response[0].childUpgraded[4],response[0].childUpgraded[5])),
-                }
-                resolve(userdata)
-            }
         })
     })
 }
@@ -864,6 +853,10 @@ router.put('/updateAdminDetails', (req,res) => {
         lvl2ser:req.body.lvl2ser,
         lvl3dep:req.body.lvl3dep,
         lvl3ser:req.body.lvl3ser,
+        lvl4dep:req.body.lvl4dep,
+        lvl4ser:req.body.lvl4ser,
+        lvl5dep:req.body.lvl5dep,
+        lvl5ser:req.body.lvl5ser,
     },{useFindAndModify:false}, (err,response) => {
         if(err) console.log(err);
     }).then(result => {

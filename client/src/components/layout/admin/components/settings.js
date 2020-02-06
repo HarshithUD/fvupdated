@@ -21,6 +21,10 @@ class settings extends Component {
             lvl2ser: '',
             lvl3dep: '',    
             lvl3ser: '',
+            lvl4dep: '',    
+            lvl4ser: '',
+            lvl5dep: '',    
+            lvl5ser: '',
         }
     }
 
@@ -44,6 +48,10 @@ class settings extends Component {
                     lvl2ser: resData.lvl2ser,
                     lvl3dep: resData.lvl3dep,
                     lvl3ser: resData.lvl3ser,
+                    lvl4dep: resData.lvl4dep,
+                    lvl4ser: resData.lvl4ser,
+                    lvl5dep: resData.lvl5dep,
+                    lvl5ser: resData.lvl5ser,
                 })
             }
         )
@@ -70,9 +78,13 @@ class settings extends Component {
             lvl1dep:this.state.lvl1dep,
             lvl2dep:this.state.lvl2dep,
             lvl3dep:this.state.lvl3dep,
+            lvl4dep:this.state.lvl4dep,
+            lvl5dep:this.state.lvl5dep,
             lvl1ser:this.state.lvl1ser,
             lvl2ser:this.state.lvl2ser,
-            lvl3ser:this.state.lvl3ser
+            lvl3ser:this.state.lvl3ser,
+            lvl4ser:this.state.lvl4ser,
+            lvl5ser:this.state.lvl5ser
         };
         Swal.fire({
             title: "Please Wait...",
@@ -154,6 +166,38 @@ class settings extends Component {
                     <label htmlFor="lvl3ser" className="font-weight-bold">Level 3 Company charges<span className="required">*</span></label>
                     <div className="input-group mb-3">
                     <input type="number" className="form-control" id="lvl3ser" aria-describedby="basic-addon3" required onChange={this.handleChange} value={this.state.lvl3ser} />
+                    </div>                
+                    </div>
+                    </div>
+                    <div className="col-md-6">
+                    <div className="wrapper">
+                    <label htmlFor="lvl4dep" className="font-weight-bold">Level 4 Deposit amount <span className="required">*</span></label>
+                    <div className="input-group mb-3">
+                    <input type="number" className="form-control" id="lvl4dep" aria-describedby="basic-addon3" required onChange={this.handleChange} value={this.state.lvl4dep} />
+                    </div>                
+                    </div>
+                    </div>
+                    <div className="col-md-6">
+                    <div className="wrapper">
+                    <label htmlFor="lvl4ser" className="font-weight-bold">Level 4 Company charges<span className="required">*</span></label>
+                    <div className="input-group mb-3">
+                    <input type="number" className="form-control" id="lvl4ser" aria-describedby="basic-addon3" required onChange={this.handleChange} value={this.state.lvl4ser} />
+                    </div>                
+                    </div>
+                    </div>
+                    <div className="col-md-6">
+                    <div className="wrapper">
+                    <label htmlFor="lvl5dep" className="font-weight-bold">Level 5 Deposit amount <span className="required">*</span></label>
+                    <div className="input-group mb-3">
+                    <input type="number" className="form-control" id="lvl5dep" aria-describedby="basic-addon3" required onChange={this.handleChange} value={this.state.lvl5dep} />
+                    </div>                
+                    </div>
+                    </div>
+                    <div className="col-md-6">
+                    <div className="wrapper">
+                    <label htmlFor="lvl5ser" className="font-weight-bold">Level 5 Company charges<span className="required">*</span></label>
+                    <div className="input-group mb-3">
+                    <input type="number" className="form-control" id="lvl5ser" aria-describedby="basic-addon3" required onChange={this.handleChange} value={this.state.lvl5ser} />
                     </div>                
                     </div>
                     </div>

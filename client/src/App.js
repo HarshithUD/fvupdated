@@ -22,7 +22,9 @@ import Approve from './components/layout/admin/components/toApprove'
 import Approved from './components/layout/admin/components/approvedUser'
 import SilverUser from './components/layout/admin/components/silverUsers'
 import GoldUser from './components/layout/admin/components/goldUsers'
-import SapphireUser from './components/layout/admin/components/sapphire'
+import Emarald from './components/layout/admin/components/emarald'
+import Ruby from './components/layout/admin/components/rubyUsers'
+import Diamond from './components/layout/admin/components/diamond'
 import AdminDowntree from './components/layout/admin/components/downtree'
 import Activate from './components/layout/admin/components/activate'
 import Declined from './components/layout/admin/components/declined'
@@ -80,7 +82,9 @@ class App extends Component {
       <PrivateRouteAdmin exact path="/admin/downtree" component={AdminDowntree} />
       <PrivateRouteAdmin exact path="/admin/silver-users" component={SilverUser} />
       <PrivateRouteAdmin exact path="/admin/gold-users" component={GoldUser} />
-      <PrivateRouteAdmin exact path="/admin/sapphire-users" component={SapphireUser} />
+      <PrivateRouteAdmin exact path="/admin/emarald-users" component={Emarald} />
+      <PrivateRouteAdmin exact path="/admin/ruby-users" component={Ruby} />
+      <PrivateRouteAdmin exact path="/admin/diamond-users" component={Diamond} />
     </Switch>
     </Router>
     </Provider>

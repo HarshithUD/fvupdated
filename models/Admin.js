@@ -31,6 +31,14 @@ const adminSchema = new Schema({
         type:Number,
         default:0
     },
+    lvl4dep:{
+        type:Number,
+        default:0
+    },
+    lvl5dep:{
+        type:Number,
+        default:0
+    },
     lvl1ser:{
         type:Number,
         default:0
@@ -40,6 +48,14 @@ const adminSchema = new Schema({
         default:0
     },
     lvl3ser:{
+        type:Number,
+        default:0
+    },
+    lvl4ser:{
+        type:Number,
+        default:0
+    },
+    lvl5ser:{
         type:Number,
         default:0
     },

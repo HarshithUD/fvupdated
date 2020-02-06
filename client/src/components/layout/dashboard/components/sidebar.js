@@ -10,7 +10,8 @@ class sidebar extends Component {
   constructor(props){
     super(props);
     this.state = {
-      userLevel:''
+      userLevel:'',
+      imagePath:''
     }
   }
 
@@ -70,6 +71,31 @@ class sidebar extends Component {
           this.setState({
             userLevel:res.data.level
           })
+          if(this.state.userLevel === 'silver'){
+            this.setState({
+              imagePath:require('../../images/003-medal-1.png')
+            })
+          }
+          else if(this.state.userLevel === 'gold'){
+            this.setState({
+              imagePath:require('../../images/002-medal.png')
+            })
+          }
+          else if(this.state.userLevel === 'emarald'){
+            this.setState({
+              imagePath:require('../../images/005-emerald.png')
+            })
+          }
+          else if(this.state.userLevel === 'ruby'){
+            this.setState({
+              imagePath:require('../../images/004-ruby.png')
+            })
+          }
+          else if(this.state.userLevel === 'diamond'){
+            this.setState({
+              imagePath:require('../../images/001-diamond.png')
+            })
+          }
         }
       )
     }
@@ -95,7 +121,7 @@ class sidebar extends Component {
                 </div>
                 <div className="user-info">
                   <span className="user-name">
-                    <strong>{this.props.user.name}</strong>
+                    <strong>{this.props.user.name} - <img src={this.state.imagePath} alt={this.state.userLevel} style={{width:'20px',margin:'5px'}}/></strong>
                   </span>
                   <span className="badge badge-secondary user-role" style={{fontSize:'13px',fontWeight:'400'}}>{this.state.userLevel}</span>
                   <span className="user-status">
