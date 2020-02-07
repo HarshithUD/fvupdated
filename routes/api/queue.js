@@ -42,10 +42,10 @@ router.get('/approve/:userid',async (request,response) => {
     //get referrer details who is a parent of this user
     var referrer = await getReferrer(_id);
     // Get user tree structure
-    var getTree = await getUserTree(_id,referrer);
-    // Do initial Process
     var referreris = await getUserDetails(_id);
     var doInitial = await addInitialVal(_id,referreris.referrer);
+    var getTree = await getUserTree(_id,referrer);
+    // Do initial Process
     response.send(doInitial);
 });
 
@@ -129,7 +129,7 @@ async function getDescandants(_id){
             var getSecondChild = await getChildren(userInfo.childIds[1].userId);
             // Get count
             var countChild = getFirstChild.length + getSecondChild.length;
-            if(countChild === 3){
+            if(countChild === 4){
                 // var checkForInitialStage = checkForStage(tree);
                 await upgradeStage(_id);
             }
@@ -179,7 +179,8 @@ async function upgradeStage(_id){
     var stageUpgrade = await User.findOneAndUpdate({_id},{
         $set:{
             stage:2,
-            childIds:[]
+            childIds:[],
+            parentId:null
         },
         $push:{
             transactions:{          
@@ -189,7 +190,7 @@ async function upgradeStage(_id){
             }
         },
         $inc:{
-            wallet:(3*adminData.lvl1depfin)-(adminData.lvl1depfin),
+            wallet:-(adminData.lvl1depfin),
             "payout.eligible":(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
         }
     },{useFindAndModify:false})
@@ -203,9 +204,9 @@ async function getNextLevel(level){
         return 'gold';
     }
     else if(level === 'gold'){
-        return 'emarald';
+        return 'emerald';
     }
-    else if(level === 'emarald'){
+    else if(level === 'emerald'){
         return 'ruby';
     }
     else if(level === 'ruby'){
@@ -224,7 +225,7 @@ async function adminAmount(adminData,level){
     else if(level === 'gold'){
         return adminData.lvl2depfin;
     }
-    else if(level === 'emarald'){
+    else if(level === 'emerald'){
         return adminData.lvl3depfin;
     }
     else if(level === 'ruby'){
@@ -241,10 +242,11 @@ async function upgradeStage2P(_id){
     var nextLevel = await getNextLevel(getUserInfos.level);
     var adminData = await getAdminResult();
     var getAmount = await adminAmount(adminData,getUserInfos.level)
-    if(getUserInfos.stage <= 2){
+    if(getUserInfos.stage < 2){
     var stageUpgrade = await User.findOneAndUpdate({_id},{
         $set:{
-            childIds:[]
+            childIds:[],
+            parentId:null
         },
         $push:{
             transactions:{          
@@ -255,45 +257,53 @@ async function upgradeStage2P(_id){
         },
         $inc:{
             stage:1,
-            wallet:(3*getAmount)-(getAmount),
+            wallet:-(getAmount),
             "payout.eligible":(3*getAmount)-(getAmount)
         }
-    },{useFindAndModify:false})
+    },{useFindAndModify:false});
+    // let number = stageUpgrade.number;
+    // const message = "Congrats! Your wallet balance is updated with."+(3*getAmount)-(getAmount)+" referral funds.";
+    // request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
     }
-    else if(getUserInfos.stage > 2 && getUserinfos.stage < 4){
-        var stageUpgrade = await User.findOneAndUpdate({_id},{
-            $set:{
-                childIds:[]
-            },
-            $push:{
-                transactions:{          
-                    name:"Deposit",
-                    type:"Deposit",
-                    amount:'-'+getAmount
-                }
-            },
-            $inc:{
-                stage:1,
-                wallet:(3*getAmount)-(getAmount)
-            }
-        },{useFindAndModify:false})
-    }
-    else if(getUserInfos.stage === 4 && getUserInfos.level !== 'diamond'){
+    // else if(getUserInfos.stage > 2 && getUserinfos.stage < 10){
+    //     var stageUpgrade = await User.findOneAndUpdate({_id},{
+    //         $set:{
+    //             childIds:[],
+    //             parentId:null
+    //         },
+    //         $push:{
+    //             transactions:{          
+    //                 name:"Deposit",
+    //                 type:"Deposit",
+    //                 amount:'-'+getAmount
+    //             }
+    //         },
+    //         $inc:{
+    //             stage:1,
+    //             wallet:-(getAmount)
+    //         }
+    //     },{useFindAndModify:false})
+    // }
+    else if(getUserInfos.stage === 2 && getUserInfos.level !== 'diamond'){
         var stageUpgrade = await User.findOneAndUpdate({_id},{
             $set:{
                 childIds:[],
                 stage:1,
                 level:nextLevel,
-                wallet:0
+                wallet:getUserInfos.payout.eligible,
+                parentId:null
             },
             $push:{
                 transactions:{          
                     name:"Deposit",
                     type:"Deposit",
-                    amount:'-'+getUserInfos.wallet
+                    amount:'-'+(getUserInfos.wallet-getUserInfos.payout.eligible)
                 }
             }
-        },{useFindAndModify:false})
+        },{useFindAndModify:false});
+        // let number = stageUpgrade.number;
+        // const message = "Congrats! You are now "+nextLevel.toUpperCase()+" member with Fortune Vision Family.";
+        // request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
     }
     else{
         return;
@@ -335,28 +345,43 @@ async function addInitialVal(_id,referrer){
             name:"Initial Deposit",
             type:"Deposit",
             amount:'+'+initialDeposit
-        }}},{useFindAndModify:false,new:true},(errors,result)=>{
+        }}},{useFindAndModify:false,new:true},async (errors,result)=>{
             if(errors){
                 console.log(errors);
             }
             else{
+                // let number = result.number;
+                // const message = "Congrats! You are now SILVER member with Fortune Vision Family.";
+                // request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
                 if(result.parentId !== null){
-                User.findByIdAndUpdate({_id:result.parentId},{$push:{
+                var update1 = await User.findByIdAndUpdate({_id:result.parentId},{$push:{
                     childIds:{
                         userId:result._id
                     },
                     transactions:{          
                         name:"Referral",
                         type:"Credit",
-                        amount:'-'+(0.5*adminData.lvl1depfin)
+                        amount:'+'+(0.5*adminData.lvl1depfin)
                     }
                 },
                 $inc:{
                     wallet:0.5*(adminData.lvl1depfin)
                 }
-            },{useFindAndModify:false},async (err,res)=>{
-                    if(err){console.log(err)}
-                })
+            },{useFindAndModify:false});
+            if(update1.parentId !== null){
+            var update2 = await User.findOneAndUpdate({_id:update1.parentId},{
+                $push:{
+                    transactions:{          
+                        name:"Referral",
+                        type:"Credit",
+                        amount:'+'+(0.5*adminData.lvl1depfin)
+                    }
+                },
+                $inc:{
+                    wallet:(0.5*adminData.lvl1depfin)
+                }
+            },{useFindAndModify:false});
+            }
             }
             }
         })
@@ -389,7 +414,7 @@ async function adminAmountStage2P(_id){
     else if(level === 'gold'){
         return adminData.lvl2depfin;
     }
-    else if(level === 'emarald'){
+    else if(level === 'emerald'){
         return adminData.lvl3depfin;
     }
     else if(level === 'ruby'){
@@ -412,9 +437,10 @@ async function stageUpgradation(_id){
         // If first time it enters new Queue
         var reset = await User.findOneAndUpdate({_id},{
             $set:{
-                childIds:[]
+                childIds:[],
+                parentId:null
             }
-        })
+        },{useFindAndModify:false})
     }
     else{
         var resStack = new Stack();
@@ -433,16 +459,30 @@ async function stageUpgradation(_id){
                         transactions:{
                             name:"Referral",
                             type:"Credit",
-                            amount:'-'+(0.5*getAdminAmount)
+                            amount:'+'+(0.5*getAdminAmount)
                         }
                     },
                     $inc:{
                         wallet:0.5*getAdminAmount
                     }
-                });
+                },{useFindAndModify:false});
+                if(updateChildodUser.parentId !== null){
+                    var update1 = await User.findOneAndUpdate({_id:updateChildodUser.parentId},{
+                        $push:{
+                            transactions:{
+                                name:"Referral",
+                                type:"Credit",
+                                amount:'+'+(0.5*getAdminAmount)
+                            }
+                        },
+                        $inc:{
+                            wallet:0.5*getAdminAmount
+                        }
+                    },{useFindAndModify:false})
+                }
                 var updatePar = await User.findOneAndUpdate({_id},{
                     $set:{parentId:resStack.items[0]}
-                })
+                },{useFindAndModify:false})
                 await checkForStageUpgrade(resStack.items[0]);
         }
         

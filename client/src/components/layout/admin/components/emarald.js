@@ -258,8 +258,8 @@ render() {
                 slno:++count,
                 name:data1.name,
                 email:data1.email,
-                stage:data1.all.level==='emarald'?data1.all.stage:data1.all.stage==='ruby'?data1.all.stage-10:data1.all.stage==='diamond'?data1.all.stage-20:data1.all.stage,
-                level:<span class="badge badge-secondary" style={{fontSize:'13px',fontWeight:'400'}}>{data1.all.level==='emarald'?data1.all.level:'emarald'}</span>,
+                stage:data1.all.level==='emerald'?data1.all.stage:data1.all.stage==='ruby'?data1.all.stage-10:data1.all.stage==='diamond'?data1.all.stage-20:data1.all.stage,
+                level:<span class="badge badge-secondary" style={{fontSize:'13px',fontWeight:'400'}}>{data1.all.level==='emerald'?data1.all.level:'emerald'}</span>,
                 date:data1.date,
                 action:<div><button type="button" className="btn btn-primary" onClick={() => this.viewDetails(data1.all)}>View Details</button>
                 </div>
@@ -279,8 +279,8 @@ render() {
       let rsname = dataCsv.all.name;
       let rsid = dataCsv.all._id;
       let rsdate = dataCsv.all.date;
-      let rsstage = dataCsv.all.level==='emarald'?dataCsv.all.stage:dataCsv.all.stage==='ruby'?dataCsv.all.stage-10:dataCsv.all.stage==='diamond'?dataCsv.all.stage-20:dataCsv.all.stage;
-      let rslevel = dataCsv.all.level==='emarald'?dataCsv.all.level:'emarald';
+      let rsstage = dataCsv.all.level==='emerald'?dataCsv.all.stage:dataCsv.all.stage==='ruby'?dataCsv.all.stage-10:dataCsv.all.stage==='diamond'?dataCsv.all.stage-20:dataCsv.all.stage;
+      let rslevel = dataCsv.all.level==='emerald'?dataCsv.all.level:'emerald';
       let rswallet = dataCsv.all.wallet;
       let rspayEli = dataCsv.all.payout && dataCsv.all.payout.eligible;
       let rsemail = dataCsv.all.email;

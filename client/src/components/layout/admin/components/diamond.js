@@ -253,7 +253,7 @@ render() {
         var count = 0;
         arr1.map((data1,index) => {
           var dateAt = new Date(data1.date);
-            if(!data1.all.declined && data1.action && (dateAt >= this.state.startDate) && (dateAt <= this.state.toDate) && data1.all.level !== 'silver' && data1.all.level !== 'gold' && data1.all.level !== 'emarald' && data1.all.level !== 'ruby' ){
+            if(!data1.all.declined && data1.action && (dateAt >= this.state.startDate) && (dateAt <= this.state.toDate) && data1.all.level !== 'silver' && data1.all.level !== 'gold' && data1.all.level !== 'emerald' && data1.all.level !== 'ruby' ){
             return resultData[index] = {
                 slno:++count,
                 name:data1.name,
@@ -275,7 +275,7 @@ render() {
     let data2arr = this.state.userDetail;
     data2arr.map((dataCsv,index) => {
       var dateAt2 = new Date(dataCsv.date);
-      if(!dataCsv.all.declined && dataCsv.all.action && dataCsv.all.active && (dateAt2 >= this.state.startDate) && (dateAt2 <= this.state.toDate) && dataCsv.all.level !== 'silver' && dataCsv.all.level !== 'gold' && dataCsv.all.level !== 'emarald' && dataCsv.all.level !== 'ruby' ){
+      if(!dataCsv.all.declined && dataCsv.all.action && dataCsv.all.active && (dateAt2 >= this.state.startDate) && (dateAt2 <= this.state.toDate) && dataCsv.all.level !== 'silver' && dataCsv.all.level !== 'gold' && dataCsv.all.level !== 'emerald' && dataCsv.all.level !== 'ruby' ){
       let rsname = dataCsv.all.name;
       let rsid = dataCsv.all._id;
       let rsdate = dataCsv.all.date;
