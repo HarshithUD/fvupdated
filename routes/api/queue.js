@@ -208,16 +208,50 @@ async function upgradeStage(_id){
 
 // Parent check for upgrade
 async function parentCheck(_id,parent){
-    if(parent !== null || typeof parent !== 'undefined'){
-            var remPar = await User.findOneAndUpdate({_id:parent,stage:1},{
-                $push:{
-                    childUpgraded:{
-                        userId:_id
+    let resultChild = null;
+    if(parent !== null){
+        var childrenofPar = await getUserDetails(parent);
+            if(childrenofPar.childIds.length > 0){
+                var getChildrens = childrenofPar.childIds;
+                if(getChildrens[0].userId === _id){
+                    if(typeof getChildrens[1] !== 'undefined'){
+                        resultChild = getChildrens[1].userId;
                     }
                 }
-            },{
-                useFindAndModify:false
-            });
+                else{
+                    resultChild = getChildrens[0].userId;
+                }
+            }
+            if(resultChild !== null){
+                var remPar = await User.findOneAndUpdate({_id:parent,stage:1},{
+                    $push:{
+                        childUpgraded:{
+                            userId:_id
+                        }
+                    },
+                    $set:{
+                        childIds:{
+                            userId:resultChild
+                        }
+                    }
+                },{
+                    useFindAndModify:false
+                });
+            }
+            else{
+                var remPar = await User.findOneAndUpdate({_id:parent,stage:1},{
+                    $push:{
+                        childUpgraded:{
+                            userId:_id
+                        }
+                    },
+                    $set:{
+                        childIds:[]
+                    }
+                },{
+                    useFindAndModify:false
+                });
+            }
             return;
     }
 }
