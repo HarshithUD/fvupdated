@@ -354,7 +354,7 @@ async function addInitialVal(_id,referrer){
                 // const message = "Congrats! You are now SILVER member with Fortune Vision Family.";
                 // request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
                 if(result.parentId !== null){
-                var update1 = await User.findByIdAndUpdate({_id:result.parentId},{$push:{
+                var update1 = await User.findByIdAndUpdate({_id:result.parentId,stage:result.stage,level:result.level},{$push:{
                     childIds:{
                         userId:result._id
                     },
@@ -453,7 +453,7 @@ async function stageUpgradation(_id){
         })
         if(resStack.items.length === 1){
             var getAdminAmount = await adminAmountStage2P(resStack.items[0]);
-                var updateChildodUser = await User.findOneAndUpdate({_id:resStack.items[0]},{
+                var updateChildodUser = await User.findOneAndUpdate({_id:resStack.items[0],stage:getUser.stage,level:getUser.level},{
                     $push:{
                         childIds:{userId:_id},
                         transactions:{
@@ -466,7 +466,7 @@ async function stageUpgradation(_id){
                         wallet:0.5*getAdminAmount
                     }
                 },{useFindAndModify:false});
-                if(updateChildodUser.parentId !== null){
+                if(updateChildodUser !== null && updateChildodUser.parentId !== null){
                     var update1 = await User.findOneAndUpdate({_id:updateChildodUser.parentId},{
                         $push:{
                             transactions:{
@@ -527,7 +527,7 @@ setTimeout( async () => {
 },3000)
 
 async function reset(){
-    var resett = await User.updateMany({},{
+    var resett = await User.updateMany({_id:'5e2a01fc57d3c100176f0f37'},{
         $set:{
             action:false,
             childIds:[],
