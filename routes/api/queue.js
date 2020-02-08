@@ -137,7 +137,13 @@ async function getDescandants(_id){
                 return;
             }
         }
-        else{
+        else if(directChild.length === 1){
+            // Get First child's child
+            var getFirstChild = await getChildren(userInfo.childIds[0].userId);
+            var countChild = getFirstChild.length;
+            if(userInfo.childUpgraded.length > 0 && countChild === 2){
+                await upgradeStage(_id);
+            }
             return;
         }
     }
@@ -176,6 +182,7 @@ async function getDescandantsStage2P(_id){
 //initial Stage upgrade
 async function upgradeStage(_id){
     var adminData = await getAdminResult();
+    var getHisPaar = await getUserDetails(_id);
     var stageUpgrade = await User.findOneAndUpdate({_id},{
         $set:{
             stage:2,
@@ -193,9 +200,26 @@ async function upgradeStage(_id){
             wallet:-(adminData.lvl1depfin),
             "payout.eligible":(3*adminData.lvl1depfin)-(adminData.lvl1depfin)
         }
-    },{useFindAndModify:false})
+    },{useFindAndModify:false});
+    var checkTempParent = await parentCheck(_id,getHisPaar.parentId);
     var stageUpgrade = await stageUpgradation(_id);
     return stageUpgrade;
+}
+
+// Parent check for upgrade
+async function parentCheck(_id,parent){
+    if(parent !== null || typeof parent !== 'undefined'){
+            var remPar = await User.findOneAndUpdate({_id:parent,stage:1},{
+                $push:{
+                    childUpgraded:{
+                        userId:_id
+                    }
+                }
+            },{
+                useFindAndModify:false
+            });
+            return;
+    }
 }
 
 // get next level
@@ -242,7 +266,7 @@ async function upgradeStage2P(_id){
     var nextLevel = await getNextLevel(getUserInfos.level);
     var adminData = await getAdminResult();
     var getAmount = await adminAmount(adminData,getUserInfos.level)
-    if(getUserInfos.stage < 2){
+    if(getUserInfos.stage <= 5){
     var stageUpgrade = await User.findOneAndUpdate({_id},{
         $set:{
             childIds:[],
@@ -265,26 +289,26 @@ async function upgradeStage2P(_id){
     // const message = "Congrats! Your wallet balance is updated with."+(3*getAmount)-(getAmount)+" referral funds.";
     // request('http://manage.ibulksms.in/api/sendhttp.php?authkey=14403A2ZQif2h5de7a91d&mobiles='+number+'&message='+message+'&sender=FORVIS&route=4&country=91&response=json')
     }
-    // else if(getUserInfos.stage > 2 && getUserinfos.stage < 10){
-    //     var stageUpgrade = await User.findOneAndUpdate({_id},{
-    //         $set:{
-    //             childIds:[],
-    //             parentId:null
-    //         },
-    //         $push:{
-    //             transactions:{          
-    //                 name:"Deposit",
-    //                 type:"Deposit",
-    //                 amount:'-'+getAmount
-    //             }
-    //         },
-    //         $inc:{
-    //             stage:1,
-    //             wallet:-(getAmount)
-    //         }
-    //     },{useFindAndModify:false})
-    // }
-    else if(getUserInfos.stage === 2 && getUserInfos.level !== 'diamond'){
+    else if(getUserInfos.stage > 5 && getUserinfos.stage < 10){
+        var stageUpgrade = await User.findOneAndUpdate({_id},{
+            $set:{
+                childIds:[],
+                parentId:null
+            },
+            $push:{
+                transactions:{          
+                    name:"Deposit",
+                    type:"Deposit",
+                    amount:'-'+getAmount
+                }
+            },
+            $inc:{
+                stage:1,
+                wallet:-(getAmount)
+            }
+        },{useFindAndModify:false})
+    }
+    else if(getUserInfos.stage === 10 && getUserInfos.level !== 'diamond'){
         var stageUpgrade = await User.findOneAndUpdate({_id},{
             $set:{
                 childIds:[],
@@ -527,7 +551,7 @@ setTimeout( async () => {
 },3000)
 
 async function reset(){
-    var resett = await User.updateMany({_id:'5e2a01fc57d3c100176f0f37'},{
+    var resett = await User.updateMany({},{
         $set:{
             action:false,
             childIds:[],
