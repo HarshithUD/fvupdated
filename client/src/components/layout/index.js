@@ -42,7 +42,7 @@ export default class index extends Component {
 			<label for="drop" class="toggle"><span class="fa fa-bars"></span></label>
 			<input type="checkbox" id="drop" />
 			<ul class="menu ml-auto mt-1" style={{height: '100%',transform: 'translate(0,50%)'}}>
-				<li class="active"><a href="index.html">Home</a></li>
+				<li class="active"><a href="#">Home</a></li>
 				<li class=""><a href="#about">About Us</a></li>
 				<li class=""><a href="#services">Business Plan</a></li>
 				{/* <!-- <li class=""><a href="#portfolio">Portfolio</a></li> --> */}
@@ -506,7 +506,7 @@ export default class index extends Component {
 			<div class="col-md-6 contact_left">
 				<div class="contact_border p-4">
 					<h3 class="heading mb-sm-5 mb-3">BUSINESS GROWTH CONTACT US</h3>
-					<p class="text-center">Helpline Number : <a href="tel:1"> 99999-99999</a></p>
+					<p class="text-center">Helpline Number : <a href="tel:1"> 9482789066</a></p>
 					<p style={{margin:'3em 0',textAlign:'center',cursor:'pointer'}}><span onClick={this.downloadApkFile}><img src={require('./images/download.png')} style={{width:'225px'}}/></span></p>
 				</div>
 			</div>
@@ -530,8 +530,8 @@ export default class index extends Component {
 			<div class="col-lg-3 col-sm-6 mb-md-0 mb-sm-5 mb-4">
 				<h4 class="mb-4">Address Info</h4>
 				{/* <!-- <p><span class="fa mr-2 fa-map-marker"></span></span></p> --> */}
-				<p class="phone py-2"><span class="fa mr-2 fa-phone"></span> +1(12) 123 456 789 </p>
-				<p><span class="fa mr-2 fa-envelope"></span><a href="mailto:info@example.com">info@example.com</a></p>
+				<p class="phone py-2"><span class="fa mr-2 fa-phone"></span> 9482789066 </p>
+				<p><span class="fa mr-2 fa-envelope"></span><a href="mailto:info@example.com">contact@fortunevision.in</a></p>
 			</div>
 			<div class="col-lg-2 col-sm-6 mb-lg-0 mb-sm-5 mb-4">
 				<h4 class="mb-4">Quick Links</h4>
