@@ -12,7 +12,7 @@ var fileDownload = require('js-file-download');
 
 export default class index extends Component {
     componentDidMount(){
-        document.body.style.backgroundColor = "none !important";
+		document.body.style.backgroundColor = "none !important";
 	}
 	
 	downloadApkFile = (e) => {
@@ -560,7 +560,7 @@ export default class index extends Component {
 <div class="copyright">
 	<div class="container py-4">
 		<div class=" text-center">
-			<p>© 2019 Fortune Vision.</p>
+			<p>© {(new Date().getFullYear())}-{(new Date().getFullYear())+1} Fortune Vision.</p>
 		</div>
 	</div>
 </div>
@@ -572,7 +572,7 @@ export default class index extends Component {
 		<span class="fa fa-angle-up  mb-3" aria-hidden="true"></span>
 	</a>
 </div>
-            </React.Fragment>
+		</React.Fragment>
         )
     }
 }

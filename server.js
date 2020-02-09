@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const app = express()
 const port = process.env.PORT
+const port2 = process.env.PORT2
 const passport = require('passport')
 const path = require('path')
 var https = require('https')
@@ -58,12 +59,12 @@ if(process.env.NODE_ENV === 'production'){
 }
 
 
-// https.createServer({
-//     key: fs.readFileSync('/opt/bitnami/apache2/conf/server.key'),
-//     cert: fs.readFileSync('/opt/bitnami/apache2/conf/server.crt')
-//   }, app)
-//   .listen(port, function () {
-//     console.log(`Server running on Port ${port}`);
-//   })
+https.createServer({
+    key: fs.readFileSync('/opt/bitnami/apache2/conf/server.key'),
+    cert: fs.readFileSync('/opt/bitnami/apache2/conf/server.crt')
+  }, app)
+  .listen(port, function () {
+    console.log(`Server running on Port ${port}`);
+  })
 
-app.listen(port, () => console.log(`Server running on Port ${port}`));
+app.listen(port2, () => console.log(`Server running on Port ${port2}`));

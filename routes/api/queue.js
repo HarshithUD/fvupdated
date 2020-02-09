@@ -141,7 +141,9 @@ async function getDescandants(_id){
             // Get First child's child
             var getFirstChild = await getChildren(userInfo.childIds[0].userId);
             var countChild = getFirstChild.length;
+            console.log('CC '+countChild);
             if(userInfo.childUpgraded.length > 0 && countChild === 2){
+                console.log('Here')
                 await upgradeStage(_id);
             }
             return;
@@ -510,6 +512,7 @@ async function stageUpgradation(_id){
             }
         })
         if(resStack.items.length === 1){
+            console.log(resStack.items);
             var getAdminAmount = await adminAmountStage2P(resStack.items[0]);
                 var updateChildodUser = await User.findOneAndUpdate({_id:resStack.items[0],stage:getUser.stage,level:getUser.level},{
                     $push:{
