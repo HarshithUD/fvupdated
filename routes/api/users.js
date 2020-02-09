@@ -871,7 +871,7 @@ router.put('/updateAdminDetails', (req,res) => {
 
 router.get('/download', function(req, res){
 
-    var file = './build/fortuneVisionAndroid.apk';
+    var file = './client/build/fortuneVisionAndroid.apk';
     // res.download('./build/11.apk')
   
     var filename = path.basename(file);
